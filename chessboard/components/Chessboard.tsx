@@ -1,13 +1,13 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, FlatList } from "react-native";
+import { Text, View, StyleSheet, Dimensions, FlatList } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 const GRID_SIZE = 8;
-const SQUARE_SIZE = width / GRID_SIZE; // Each square is equally wide
+const BOARD_SIZE = Math.min(width, height); // Ensure board is smaller than the screen size
+const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE;
 
 const ChessGrid: React.FC = () => {
   const generateGridData = () => {
-    // Generate a grid of 64 cells, alternating colors
     return Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => ({
       id: index.toString(),
       color:
@@ -22,25 +22,32 @@ const ChessGrid: React.FC = () => {
   );
 
   return (
-    <FlatList
-      data={generateGridData()}
-      renderItem={renderSquare}
-      keyExtractor={(item) => item.id}
-      numColumns={GRID_SIZE}
-      scrollEnabled={false}
-      style={styles.grid}
-    />
+    <>
+      {1 === 1 ? (
+        <FlatList
+          data={generateGridData()}
+          renderItem={renderSquare}
+          keyExtractor={(item) => item.id}
+          numColumns={GRID_SIZE}
+          scrollEnabled={false}
+          style={styles.grid}
+        />
+      ) : (
+        <Text>User is scanned</Text>
+      )}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   grid: {
     flex: 1,
-    width: width,
-    height: height,
+    width: BOARD_SIZE, // Set the grid size to be the board size
+    height: BOARD_SIZE, // Ensures the grid is square
+    alignSelf: "center", // Centers the grid in the view
   },
   square: {
-    width: SQUARE_SIZE,
+    width: SQUARE_SIZE, // Square size based on the grid
     height: SQUARE_SIZE,
   },
 });
