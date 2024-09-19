@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Dimensions, FlatList } from "react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -7,6 +7,38 @@ const BOARD_SIZE = Math.min(width, height); // Ensure board is smaller than the 
 const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE;
 
 const ChessGrid: React.FC = () => {
+  const [isOn, setIsOn] = useState<boolean | null>(null); // Manages API state (initially null)
+
+  // Function to simulate API call (replace with actual API call logic)
+  const fetchStatusFromAPI = async () => {
+    try {
+      // Simulated API call, replace with actual API request
+      const response = await fetch("http://localhost:3801/active", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      console.log(data);
+      return data.isOn; // Assume the API returns an object with isOn field
+    } catch (error) {
+      console.error("Failed to fetch API status:", error);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(async () => {
+      const status = await fetchStatusFromAPI();
+      setIsOn(status);
+    }, 1000); // Poll every 5 seconds
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
   const generateGridData = () => {
     return Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => ({
       id: index.toString(),
@@ -23,7 +55,9 @@ const ChessGrid: React.FC = () => {
 
   return (
     <>
-      {1 === 1 ? (
+      {isOn === null ? (
+        <Text>Loading...</Text>
+      ) : !isOn ? (
         <FlatList
           data={generateGridData()}
           renderItem={renderSquare}
