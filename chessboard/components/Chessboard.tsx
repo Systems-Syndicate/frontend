@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, Dimensions, FlatList } from "react-native";
+import Example from "./Example";
+
 
 const { width, height } = Dimensions.get("window");
 const GRID_SIZE = 8;
@@ -58,16 +60,26 @@ const ChessGrid: React.FC = () => {
       {isOn === null ? (
         <Text>Loading...</Text>
       ) : !isOn ? (
-        <FlatList
-          data={generateGridData()}
-          renderItem={renderSquare}
-          keyExtractor={(item) => item.id}
-          numColumns={GRID_SIZE}
-          scrollEnabled={false}
-          style={styles.grid}
-        />
+        // <FlatList
+        //   data={generateGridData()}
+        //   renderItem={renderSquare}
+        //   keyExtractor={(item) => item.id}
+        //   numColumns={GRID_SIZE}
+        //   scrollEnabled={false}
+        //   style={styles.grid}
+        // />
+        <>
+        <Example></Example>
+        </>
       ) : (
-        <Text>User is scanned</Text>
+        <FlatList
+        data={generateGridData()}
+        renderItem={renderSquare}
+        keyExtractor={(item) => item.id}
+        numColumns={GRID_SIZE}
+        scrollEnabled={false}
+        style={styles.grid}
+      />
       )}
     </>
   );
