@@ -1,13 +1,16 @@
 import { Text, View, SafeAreaView, StyleSheet } from "react-native";
 import React from "react";
 import ChessGrid from "@/components/Chessboard";
+import { ApiProvider } from "@/components/ApiContext";
 
 export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.gridWrapper}>
-        <ChessGrid />
-      </View>
+      <ApiProvider>
+        <View style={styles.gridWrapper}>
+          <ChessGrid />
+        </View>
+      </ApiProvider>
     </SafeAreaView>
   );
 }
