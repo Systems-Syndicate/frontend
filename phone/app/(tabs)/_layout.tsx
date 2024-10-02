@@ -4,6 +4,8 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -24,7 +26,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="schedule" // schedule.tsx
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
@@ -33,12 +35,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="calendar"
+        name="daily_view" // daily-view.tsx
         options={{
-          title: 'Calendar',
+          title: 'Daily View',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+            <Icon size={30} name={focused ? 'list' : 'list-outline'} color={color} />
           ),
+          
         }}
       />
     </Tabs>
