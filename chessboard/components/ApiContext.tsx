@@ -11,6 +11,7 @@ interface ApiContextProps {
   isOn: boolean;
   loggedIn: boolean;
   setLoggedIn: (value: boolean) => void;
+  setIsOn: (value: boolean) => void;
 }
 
 interface ApiProviderProps {
@@ -21,6 +22,7 @@ const ApiContext = createContext<ApiContextProps>({
   isOn: false,
   loggedIn: false,
   setLoggedIn: () => {},
+  setIsOn: () => {},
 });
 
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
@@ -39,14 +41,8 @@ export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  useEffect(() => {
-    if (!isOn) {
-      setLoggedIn(false); // Reset loggedIn to false when isOn is false
-    }
-  }, [isOn]);
-
   return (
-    <ApiContext.Provider value={{ isOn, loggedIn, setLoggedIn }}>
+    <ApiContext.Provider value={{ isOn, loggedIn, setLoggedIn, setIsOn }}>
       {children}
     </ApiContext.Provider>
   );

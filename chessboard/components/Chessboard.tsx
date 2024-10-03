@@ -55,7 +55,7 @@ const ChessGrid: React.FC = () => {
       ) : loggedIn ? (
         // State 2: loggedIn True, isOn True -> show a new component
         <View>
-          <Text>You are logged in!</Text>
+          <Text> Error: This shouldn't be showing.</Text>
         </View>
       ) : (
         // State 1: loggedIn False, isOn True -> show chessboard and lock with center squares yellow
