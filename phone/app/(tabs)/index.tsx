@@ -6,6 +6,7 @@ import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // Define the Event type
 interface Event {
@@ -31,6 +32,17 @@ export default function HomeScreen() {
 
 
   const handleSave = () => {
+    if (eventName === '') {
+      alert('Event name is required.');
+      return;
+    }
+
+    if (eventEndTime <= eventStartTime) {
+      alert('End datetime must be after start datetime.');
+      return;
+    }
+  
+
     const newEvent: Event = {
       id: `${new Date().getTime()}`, 
       name: eventName,
@@ -61,11 +73,19 @@ export default function HomeScreen() {
 
   // Group events by date
   const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, event) => {
-    const dateString = formatDate(event.startTime);
-    if (!acc[dateString]) {
-      acc[dateString] = [];
+    const startDate = new Date(event.startTime);
+    const endDate = new Date(event.endTime);
+
+    // Iterate through each date from start to end
+    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateString = formatDate(new Date(d)); // Format the date to string
+      if (!acc[dateString]) {
+        acc[dateString] = [];
+      }
+      // Push a clone of the event to avoid mutation
+      acc[dateString].push({ ...event });
     }
-    acc[dateString].push(event);
+
     return acc;
   }, {});
 
@@ -77,17 +97,13 @@ export default function HomeScreen() {
           source={require('@/assets/images/partial-react-logo.png')}
           style={styles.reactLogo}
         />
-      }>
+      }
+    >
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Day 'n Knight</ThemedText>
         <HelloWave />
       </ThemedView>
-
-      {/* Buttons Section */}
-      <View style={styles.buttonContainer}>
-        <Button title="Create a New Event" onPress={() => setModalVisible(true)} />
-      </View>
-
+  
       {/* Render Grouped Events */}
       <View style={styles.eventsContainer}>
         {Object.entries(groupedEvents).map(([date, events]) => (
@@ -105,6 +121,11 @@ export default function HomeScreen() {
           </View>
         ))}
       </View>
+  
+      {/* Circular Button */}
+      <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
+        <MaterialIcons name="add" size={24} color="white" />
+      </TouchableOpacity>
 
       {/* Modal for Adding Event */}
       <Modal
@@ -373,4 +394,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', // Optional: make the heading bold
     fontSize: 24,       // Optional: adjust font size
   },
+
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#007AFF', // Change to your preferred color
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5, // For Android shadow
+    shadowColor: '#000', // For iOS shadow
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  
 });
