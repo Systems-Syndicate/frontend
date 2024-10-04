@@ -1,105 +1,97 @@
-import { Button, View, Text } from 'react-native';
+import { Button, View } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import DailyView from './(hamburger)/daily_view';
 import CreateEvent from './(hamburger)/create_event';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { useCallback, useEffect, useState } from 'react';
-import Entypo from '@expo/vector-icons/Entypo';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
+import 'react-native-reanimated';
+import { useColorScheme } from '@/hooks/useColorScheme';
+
+import { StatusBar } from 'expo-status-bar';
+import { ThemedView } from '@/components/ThemedView';
+
 
 
 function HomeScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Button
         onPress={() => navigation.navigate('Notifications')}
         title="Go to notifications"
       />
-    </View>
+    </ThemedView>
   );
 }
 
 function NotificationsScreen({ navigation }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+    <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Button onPress={() => navigation.goBack()} title="Go back home" />
-    </View>
+    </ThemedView>
   );
 }
 
 const Drawer = createDrawerNavigator();
 
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
+
+
 export default function App() {
-  const [appIsReady, setAppIsReady] = useState(false);
+  const colorScheme = useColorScheme();
+  const [loaded] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  });
 
   useEffect(() => {
-    async function prepare() {
-      try {
-        // Pre-load fonts, make any API calls you need to do here
-        await Font.loadAsync(Entypo.font);
-        // Artificially delay for two seconds to simulate a slow loading
-        // experience. Please remove this if you copy and paste the code!
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        // Tell the application to render
-        setAppIsReady(true);
-      }
+    if (loaded) {
+      SplashScreen.hideAsync();
+
     }
+  }, [loaded]);
 
-    prepare();
-  }, []);
-
-  const onLayoutRootView = useCallback(async () => {
-    if (appIsReady) {
-      // This tells the splash screen to hide immediately! If we call this after
-      // `setAppIsReady`, then we may see a blank screen while the app is
-      // loading its initial state and rendering its first pixels. So instead,
-      // we hide the splash screen once we know the root view has already
-      // performed layout.
-      await SplashScreen.hideAsync();
-    }
-  }, [appIsReady]);
-
-  if (!appIsReady) {
+  if (!loaded) {
     return null;
   }
 
   return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <StatusBar backgroundColor={colorScheme === 'dark' ? 'black' : 'white'} hidden={false}/>
       <Drawer.Navigator initialRouteName="Home"
-        onLayout={onLayoutRootView}
         screenOptions={({ navigation }) => ({
+          headerStatusBarHeight: 4,
           drawerType: "front", 
           headerLeft: () => (
             <Icon
               name="menu"
               size={28}
-              color="white" 
+              color={colorScheme === 'dark' ? 'white' : DefaultTheme}
               style={{ marginLeft: 16 }}
               onPress={() => navigation.toggleDrawer()}
             />
           ),
           headerRight: () => (
               <View style={{flexDirection: 'row', justifyContent: 'space-between', marginRight: 16}}>
-                  <Icon name="search-outline" style={{color: "white", fontSize: 24, marginRight: 16}}/>
-                  <Icon name="calendar-clear-outline" style={{color: "white", fontSize: 24,}}/>
+                  <Icon name="search-outline" style={{color: colorScheme === 'dark' ? 'white' : DefaultTheme, fontSize: 24, marginRight: 16}}/>
+                  <Icon name="calendar-clear-outline" style={{color: colorScheme === 'dark' ? 'white' : DefaultTheme, fontSize: 24,}}/>
               </View>
           ),
           drawerIcon: ({ color, size }) => (
-            <Icon name="calendar" size={size} color="blue" /> // Change color here
+            <Icon name="calendar" size={size} color={colorScheme === 'dark' ? 'white' : DefaultTheme}/> 
           ),
           drawerStyle: {
-            backgroundColor: 'lightblue',
             width: 240,
           },
           headerStyle: {
-            backgroundColor: "black",
+            backgroundColor: colorScheme === 'dark' ? DarkTheme : 'lightblue',
           },
           headerTitleStyle: {
-            color: "white",
+            color: colorScheme === 'dark' ? 'white' : DefaultTheme,
           }
         })}>
           <Drawer.Screen name="Home" component={HomeScreen} />
@@ -107,6 +99,7 @@ export default function App() {
           <Drawer.Screen name="DailyView" component={DailyView} />
           <Drawer.Screen name="CreateEvent" component={CreateEvent} />
       </Drawer.Navigator>
+    </ThemeProvider>
   );
 }
 

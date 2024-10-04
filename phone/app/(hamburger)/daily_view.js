@@ -1,166 +1,168 @@
-import { StyleSheet, View, Text, ScrollView, SafeAreaView, Button } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+
 
 export default function DailyView() {
     return (
         <SafeAreaView>
-            <View style={styles.body}>
-                <Text style={{flexDirection: 'row', textAlign: 'center', fontSize: 24, color: 'white', margin: 4, marginBottom: 16}}> SEPT </Text>
+            <ThemedView style={styles.body}>
+                <ThemedText style={{flexDirection: 'row', textAlign: 'center', fontSize: 24, margin: 4, marginBottom: 16}}> SEPT </ThemedText>
 
-                <View style={{flexDirection: 'row', justifyContent:'space-between'}}>
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Mon </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 26 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 2 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 9 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 16 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 23 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 30 </Text>
-                            </View>
-                        </View>
-                    </View>
+                <ThemedView style={{flexDirection: 'row', justifyContent:'space-between'}}>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Mon </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 26 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 2 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 9 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 16 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 23 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 30 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Tue </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 27 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 3 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 10 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 17 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 24 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Tue </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 27 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 3 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 10 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 17 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 24 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Wed </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 28 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 4 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 11 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 18 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 25 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Wed </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 28 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 4 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 11 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 18 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 25 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Thu </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 29 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 5 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 12 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 19 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 26 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Thu </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 29 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 5 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 12 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 19 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 26 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Fri </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 30 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 6 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 13 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 20 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 27 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Fri </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 30 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 6 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 13 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 20 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 27 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Sat </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 31 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 7 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 14 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 21 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 28 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Sat </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 31 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 7 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 14 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 21 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 28 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
 
-                    <View style={{flexDirection: 'column'}}>
-                        <Text style={styles.text}> Sun </Text>
-                        <View style={{flexDirection: 'column'}}>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 1 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 8 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 15 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 22 </Text>
-                            </View>
-                            <View style={styles.daycontainers}>
-                                <Text style={styles.text}> 29 </Text>
-                            </View>
-                        </View>
-                    </View>
+                    <ThemedView style={{flexDirection: 'column'}}>
+                        <ThemedText style={styles.text}> Sun </ThemedText>
+                        <ThemedView style={{flexDirection: 'column'}}>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 1 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 8 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 15 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 22 </ThemedText>
+                            </ThemedView>
+                            <ThemedView style={styles.daycontainers}>
+                                <ThemedText style={styles.text}> 29 </ThemedText>
+                            </ThemedView>
+                        </ThemedView>
+                    </ThemedView>
                     
-                </View>
-                </View>
+                </ThemedView>
+                </ThemedView>
         </SafeAreaView>
     );
 }
@@ -170,7 +172,7 @@ const styles = StyleSheet.create({
         paddingTop: 48,
         paddingLeft: 8,
         paddingRight: 8,
-        backgroundColor: 'black',
+        // backgroundColor: 'black',
     },
     headerBar: {
         flexDirection: 'row', 
@@ -181,22 +183,22 @@ const styles = StyleSheet.create({
         margin: 12,
         marginBottom: 0,
         fontSize: 24,
-        color: "white",
+        // color: "white",
     },
     headerRight: {
         margin: 12,
         marginBottom: 0,
         fontSize: 24,
-        color: "white",
+        // color: "white",
     },
     body: {
-        backgroundColor: 'black',
+        // backgroundColor: 'black',
         padding: 16
     },
     text: {
         fontSize: 16,
         lineHeight: 24,
-        color: 'white',
+        // color: 'white',
         textAlign: 'center'
     },
     daycontainers: {
