@@ -166,11 +166,11 @@ export default function App() {
     const addTimeSlot = (startTime, endTime, name, eventName) => {
         const startDate = moment(startTime, 'HH:mm').toDate();
         const endDate = moment(endTime, 'HH:mm').toDate();
-        
+    
         // Determine the column index based on the user's index
         const userIndex = userNames.indexOf(name);
         const columnIndex = userIndex % colors.length;  // Modulo to stay within color bounds
-
+    
         const newTimeSlot = {
             id: uuidv4(),  // Ensure unique ID for each event
             title: eventName,
@@ -178,11 +178,13 @@ export default function App() {
             endDate: endDate,
             color: colors[columnIndex], // Use the color based on the user's index
             name: name,
+            columnIndex: columnIndex, // Store the column index for layout
         };
-
+    
         setItems(prevItems => [...prevItems, newTimeSlot]);
         setModalVisible(false);
     };
+    
 
     return (
         <ScrollView>
