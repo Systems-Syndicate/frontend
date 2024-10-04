@@ -4,17 +4,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 export default function DailyView() {
     return (
         <SafeAreaView>
-            {/* <View style={styles.header}>
-                <View style={styles.headerBar}>
-                    <Icon name="menu-outline" style={styles.hamburger}> 
-                    </Icon>
-                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                        <Icon name="search-outline" style={styles.headerRight}/>
-                        <Icon name="calendar-clear-outline" style={styles.headerRight}/>
-                    </View>
-                </View>                
-            </View> */}
-
             <View style={styles.body}>
                 <Text style={{flexDirection: 'row', textAlign: 'center', fontSize: 24, color: 'white', margin: 4, marginBottom: 16}}> SEPT </Text>
 

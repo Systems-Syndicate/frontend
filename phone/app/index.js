@@ -1,11 +1,13 @@
-import * as React from 'react';
-import { Button, View } from 'react-native';
+import { Button, View, Text } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
 import DailyView from './(hamburger)/daily_view';
 import CreateEvent from './(hamburger)/create_event';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { StyleSheet } from 'react-native';
+
+import { useCallback, useEffect, useState } from 'react';
+import Entypo from '@expo/vector-icons/Entypo';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
 
 
 function HomeScreen({ navigation }) {
@@ -27,21 +29,48 @@ function NotificationsScreen({ navigation }) {
   );
 }
 
-function headerRight() {
-  return (        
-  <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-    <Icon name="search-outline" style={styles.headerRight}/>
-    <Icon name="calendar-clear-outline" style={styles.headerRight}/>
-  </View>
-  )
-}
-
-
 const Drawer = createDrawerNavigator();
 
 export default function App() {
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Pre-load fonts, make any API calls you need to do here
+        await Font.loadAsync(Entypo.font);
+        // Artificially delay for two seconds to simulate a slow loading
+        // experience. Please remove this if you copy and paste the code!
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return null;
+  }
+
   return (
       <Drawer.Navigator initialRouteName="Home"
+        onLayout={onLayoutRootView}
         screenOptions={({ navigation }) => ({
           drawerType: "front", 
           headerLeft: () => (
@@ -81,42 +110,3 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({  
-  header: {
-      paddingTop: 48,
-      paddingLeft: 8,
-      paddingRight: 8,
-      backgroundColor: 'black',
-  },
-  headerBar: {
-      flexDirection: 'row', 
-      justifyContent: 'space-between', 
-      // backgroundColor: 'blue',
-  },
-  hamburger: {
-      margin: 12,
-      marginBottom: 0,
-      fontSize: 24,
-      color: "white",
-  },
-  headerRight: {
-      margin: 12,
-      marginBottom: 0,
-      fontSize: 24,
-      color: "white",
-  },
-  body: {
-      backgroundColor: 'black',
-      padding: 16
-  },
-  text: {
-      fontSize: 16,
-      lineHeight: 24,
-      color: 'white',
-      textAlign: 'center'
-  },
-  daycontainers: {
-      paddingTop: 4, 
-      paddingBottom: 48
-  }
-});
