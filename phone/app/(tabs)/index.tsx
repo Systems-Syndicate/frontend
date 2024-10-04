@@ -78,13 +78,13 @@ export default function HomeScreen() {
         />
       }>
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Day N Knight</ThemedText>
+        <ThemedText type="title">Day 'n Knight</ThemedText>
         <HelloWave />
       </ThemedView>
 
       {/* Buttons Section */}
       <View style={styles.buttonContainer}>
-        <Button title="Add a New Event" onPress={() => setModalVisible(true)} />
+        <Button title="Create a New Event" onPress={() => setModalVisible(true)} />
       </View>
 
       {/* Render Grouped Events */}
@@ -122,7 +122,7 @@ export default function HomeScreen() {
               placeholderTextColor="#999"
             />
             <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-              <ThemedText style={styles.modalText}>{eventStartTime.toLocaleString()}</ThemedText>
+              <ThemedText style={styles.modalText}>{"Event start and end time"}</ThemedText>
             </TouchableOpacity>
 
             {showDatePicker && (
@@ -134,7 +134,19 @@ export default function HomeScreen() {
                   const currentDate = selectedDate || eventStartTime;
                   setShowDatePicker(false);
                   setEventStartTime(currentDate);
-                  setEventEndTime(new Date(currentDate.getTime() + 3600000)); // Set end time to 1 hour later
+                }}
+              />
+            )}
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={eventStartTime}
+                mode="datetime"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  const currentDate = selectedDate || eventStartTime;
+                  setShowDatePicker(false);
+                  setEventEndTime(currentDate);
                 }}
               />
             )}
