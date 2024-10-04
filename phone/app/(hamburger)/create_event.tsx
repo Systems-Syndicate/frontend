@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Platform, Button, View, Modal, TextInput, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, SafeAreaView, Text, Button, View, Modal, TextInput, TouchableOpacity, ScrollView, TouchableHighlight } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns'; // Import date-fns for formatting dates
+import Icon from 'react-native-vector-icons/Ionicons';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Swipeable } from 'react-native-gesture-handler';
 
 
 // Define the Event type
@@ -20,7 +18,8 @@ interface Event {
   location: string; // Event location
 }
 
-export default function HomeScreen() {
+export default function CreateEvent({navigation}: {navigation: any}) {
+  
   const [modalVisible, setModalVisible] = useState(false);
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -69,17 +68,9 @@ export default function HomeScreen() {
   }, {});
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
+    <SafeAreaView>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title">Day N Knight</ThemedText>
-        <HelloWave />
       </ThemedView>
 
       {/* Buttons Section */}
@@ -181,7 +172,7 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
-    </ParallaxScrollView>
+    </SafeAreaView>
   );
 }
 
