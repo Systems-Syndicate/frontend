@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
-import { Image, StyleSheet, Platform, Button, View, Modal, TextInput, TouchableOpacity } from 'react-native';
+import { Image, StyleSheet, Platform, Button, View, Modal, TextInput, TouchableOpacity, Switch } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { format } from 'date-fns'; // Import date-fns for formatting dates
-
+import { format, isSameDay } from 'date-fns';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Swipeable } from 'react-native-gesture-handler';
-
 
 // Define the Event type
 interface Event {
@@ -16,6 +13,7 @@ interface Event {
   name: string; // Event name
   startTime: Date; // Start time
   endTime: Date; // End time
+  isAllDay: boolean; // Flag to indicate if event is all-day
   description: string; // Event description
   location: string; // Event location
 }
@@ -27,27 +25,30 @@ export default function HomeScreen() {
   const [eventLocation, setEventLocation] = useState('');
   const [eventStartTime, setEventStartTime] = useState(new Date());
   const [eventEndTime, setEventEndTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [events, setEvents] = useState<Event[]>([]);
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); // State for selected event details
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); 
+  const [isAllDay, setIsAllDay] = useState(false);
+
 
   const handleSave = () => {
     const newEvent: Event = {
-      id: `${new Date().getTime()}`, // Unique ID
+      id: `${new Date().getTime()}`, 
       name: eventName,
       description: eventDescription,
       location: eventLocation,
-      startTime: eventStartTime,
-      endTime: eventEndTime,
+      startTime: isAllDay ? new Date(eventStartTime.setHours(0, 0, 0, 0)) : eventStartTime,
+      endTime: isAllDay ? new Date(eventEndTime.setHours(23, 59, 59, 999)) : eventEndTime,
+      isAllDay: isAllDay,
     };
-
+  
     setEvents([...events, newEvent]);
-    // Reset input fields
     setModalVisible(false);
     setEventName('');
     setEventDescription('');
     setEventLocation('');
+    setIsAllDay(false);
   };
+  
 
   // Function to format the event date and time for display
   const formatDate = (date: Date) => format(date, 'EEE, d MMM');
@@ -110,10 +111,13 @@ export default function HomeScreen() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}>
+        onRequestClose={() => setModalVisible(false)}
+      >
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
-            <ThemedText type="title" style={styles.modalText}>Create Event</ThemedText>
+          <ThemedText type="title" style={[styles.modalText, styles.headingText]}>Create a New Event</ThemedText>
+            
+            {/* Event Name Input */}
             <TextInput
               placeholder="Event Name"
               value={eventName}
@@ -121,36 +125,86 @@ export default function HomeScreen() {
               style={styles.input}
               placeholderTextColor="#999"
             />
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
-              <ThemedText style={styles.modalText}>{"Event start and end time"}</ThemedText>
-            </TouchableOpacity>
 
-            {showDatePicker && (
-              <DateTimePicker
-                value={eventStartTime}
-                mode="datetime"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  const currentDate = selectedDate || eventStartTime;
-                  setShowDatePicker(false);
-                  setEventStartTime(currentDate);
-                }}
-              />
-            )}
+            <View>
+              {/* All Day Switch */}
+              <View style={styles.switchContainer}>
+                <ThemedText style={styles.modalText}>All Day</ThemedText>
+                <Switch
+                  value={isAllDay}
+                  onValueChange={(value) => setIsAllDay(value)}
+                />
+              </View>
 
-            {showDatePicker && (
-              <DateTimePicker
-                value={eventStartTime}
-                mode="datetime"
-                display="default"
-                onChange={(event, selectedDate) => {
-                  const currentDate = selectedDate || eventStartTime;
-                  setShowDatePicker(false);
-                  setEventEndTime(currentDate);
-                }}
-              />
-            )}
+              {/* Row for Start Date and Start Time */}
+              <View style={styles.rowContainer}>
+                {/* Start Date Picker on the left */}
+                <View style={styles.pickerContainer}>
+                  <ThemedText style={styles.modalText}>Start Date</ThemedText>
+                  <DateTimePicker
+                    value={eventStartTime}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      const currentDate = selectedDate || eventStartTime;
+                      setEventStartTime(currentDate);
+                    }}
+                  />
+                </View>
 
+                {/* Start Time Picker on the right (if not all-day) */}
+                {!isAllDay && (
+                  <View style={styles.pickerContainer}>
+                    <ThemedText style={styles.modalText}>Start Time</ThemedText>
+                    <DateTimePicker
+                      value={eventStartTime}
+                      mode="time"
+                      display="default"
+                      onChange={(event, selectedTime) => {
+                        const currentTime = selectedTime || eventStartTime;
+                        setEventStartTime(currentTime);
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
+
+              {/* Row for End Date and End Time */}
+              <View style={styles.rowContainer}>
+                {/* End Date Picker on the left */}
+                <View style={styles.pickerContainer}>
+                  <ThemedText style={styles.modalText}>End Date</ThemedText>
+                  <DateTimePicker
+                    value={eventEndTime}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      const currentDate = selectedDate || eventEndTime;
+                      setEventEndTime(currentDate);
+                    }}
+                  />
+                </View>
+
+                {/* End Time Picker on the right (if not all-day) */}
+                {!isAllDay && (
+                  <View style={styles.pickerContainer}>
+                    <ThemedText style={styles.modalText}>End Time</ThemedText>
+                    <DateTimePicker
+                      value={eventEndTime}
+                      mode="time"
+                      display="default"
+                      onChange={(event, selectedTime) => {
+                        const currentTime = selectedTime || eventEndTime;
+                        setEventEndTime(currentTime);
+                      }}
+                    />
+                  </View>
+                )}
+              </View>
+            </View>
+
+
+            {/* Other input fields (Description, Location) */}
             <TextInput
               placeholder="Description"
               value={eventDescription}
@@ -165,34 +219,57 @@ export default function HomeScreen() {
               style={styles.input}
               placeholderTextColor="#999"
             />
+
+            {/* Save and Cancel buttons */}
             <Button title="Save" onPress={handleSave} />
             <Button title="Cancel" onPress={() => setModalVisible(false)} />
           </View>
         </View>
       </Modal>
+  
+        {/* Modal for Displaying Event Details */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={!!selectedEvent}
+          onRequestClose={() => setSelectedEvent(null)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalView}>
+              {selectedEvent && (
+                <>
+                  <ThemedText type="title" style={styles.modalText}>
+                    {selectedEvent.name}
+                  </ThemedText>
 
-      {/* Modal for Viewing Event Details */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={!!selectedEvent}
-        onRequestClose={() => setSelectedEvent(null)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalView}>
-            {selectedEvent && (
-              <>
-                <ThemedText type="title" style={styles.modalText}>{selectedEvent.name}</ThemedText>
-                <ThemedText style={styles.modalText}>Description: {selectedEvent.description}</ThemedText>
-                <ThemedText style={styles.modalText}>Location: {selectedEvent.location}</ThemedText>
-                <ThemedText style={styles.modalText}>
-                  Time: {formatTime(selectedEvent.startTime)} - {formatTime(selectedEvent.endTime)}
-                </ThemedText>
-                <Button title="Close" onPress={() => setSelectedEvent(null)} />
-              </>
-            )}
+                  <ThemedText style={styles.modalText}>
+                    {selectedEvent.isAllDay ? (
+                      isSameDay(selectedEvent.startTime, selectedEvent.endTime) ? (
+                        `${format(selectedEvent.startTime, 'EEEE, MMMM d, yyyy')}`
+                      ) : (
+                        `${format(selectedEvent.startTime, 'EEEE, MMMM d, yyyy')} - ${format(selectedEvent.endTime, 'EEEE, MMMM d, yyyy')}`
+                      )
+                    ) : (
+                      isSameDay(selectedEvent.startTime, selectedEvent.endTime) ? (
+                        `${format(selectedEvent.startTime, 'EEEE, MMMM d, yyyy')} ${formatTime(selectedEvent.startTime)} - ${formatTime(selectedEvent.endTime)}`
+                      ) : (
+                        `${format(selectedEvent.startTime, 'EEEE, MMMM d, yyyy')} ${formatTime(selectedEvent.startTime)} - ${format(selectedEvent.endTime, 'EEEE, MMMM d, yyyy')} ${formatTime(selectedEvent.endTime)}`
+                      )
+                    )}
+                  </ThemedText>
+
+                  <ThemedText style={styles.modalText}>
+                    Location: {selectedEvent.location}
+                  </ThemedText>
+                  <ThemedText style={styles.modalText}>
+                    Description: {selectedEvent.description}
+                  </ThemedText>
+                  <Button title="Close" onPress={() => setSelectedEvent(null)} />
+                </>
+              )}
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
     </ParallaxScrollView>
   );
 }
@@ -264,6 +341,7 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+    color: '##000000',
   },
   input: {
     borderWidth: 1,
@@ -272,5 +350,27 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     backgroundColor: 'white',
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+  },
+  rowContainer: {
+    flexDirection: 'row', // Horizontal layout
+    justifyContent: 'space-between', // Space out date and time pickers
+    marginBottom: 10,
+  },
+  pickerContainer: {
+    flex: 1, // Take equal space for both date and time pickers
+    marginHorizontal: 5, // Add some horizontal spacing
+    alignItems: 'center', // Center the text and picker
+  },
+
+  headingText: {
+    color: '##000000', // Change this to your preferred color
+    fontWeight: 'bold', // Optional: make the heading bold
+    fontSize: 24,       // Optional: adjust font size
   },
 });
