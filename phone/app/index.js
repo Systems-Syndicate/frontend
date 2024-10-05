@@ -1,36 +1,34 @@
-import { Button, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Button, View, Dimensions } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import DailyView from './(hamburger)/daily_view';
-import CreateEvent from './(hamburger)/create_event';
-import Icon from 'react-native-vector-icons/Ionicons';
-
-import { useCallback, useEffect, useState } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { ThemedView } from '@/components/ThemedView';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useFonts } from 'expo-font';
+import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import DailyView from './(hamburger)/daily_view';
+import MonthlyView from './(hamburger)/monthly_view';
+import CreateEvent from './(hamburger)/create_event';
+import GetDimensions from './(hamburger)/get_dimensions';
 
-import { StatusBar } from 'expo-status-bar';
-import { ThemedView } from '@/components/ThemedView';
+const windowDimensions = Dimensions.get('window');
+const screenDimensions = Dimensions.get('screen');
 
+function HomeScreen({ route, navigation }) {
 
+  const { dimensions } = route.params;
 
-function HomeScreen({ navigation }) {
   return (
     <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
       <Button
-        onPress={() => navigation.navigate('Notifications')}
+        onPress={() => {
+          navigation.navigate('Notifications', {dimensions});
+        }}
         title="Go to notifications"
       />
-    </ThemedView>
-  );
-}
-
-function NotificationsScreen({ navigation }) {
-  return (
-    <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Button onPress={() => navigation.goBack()} title="Go back home" />
     </ThemedView>
   );
 }
@@ -41,17 +39,20 @@ const Drawer = createDrawerNavigator();
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-
 export default function App() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
+  const [dimensions, setDimensions] = useState({
+    window: windowDimensions,
+    screen: screenDimensions,
+  });
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-
     }
   }, [loaded]);
 
@@ -61,7 +62,7 @@ export default function App() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <StatusBar backgroundColor={colorScheme === 'dark' ? 'black' : 'white'} hidden={false}/>
+      <StatusBar backgroundColor={colorScheme === 'dark' ? 'black' : 'white'} hidden={false} animated={true} />
       <Drawer.Navigator initialRouteName="Home"
         screenOptions={({ navigation }) => ({
           headerStatusBarHeight: 4,
@@ -94,9 +95,10 @@ export default function App() {
             color: colorScheme === 'dark' ? 'white' : DefaultTheme,
           }
         })}>
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="Notifications" component={NotificationsScreen} />
+          <Drawer.Screen name="Home" component={HomeScreen} initialParams={{ dimensions }} />
+          <Drawer.Screen name="Notifications" component={GetDimensions} initialParams={{ dimensions }} />
           <Drawer.Screen name="DailyView" component={DailyView} />
+        <Drawer.Screen name="MonthlyView" component={MonthlyView} initialParams={{ dimensions }} />
           <Drawer.Screen name="CreateEvent" component={CreateEvent} />
       </Drawer.Navigator>
     </ThemeProvider>
