@@ -1,28 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, Dimensions, FlatList } from "react-native";
+import CalendarExample from "./CalendarExample";
 
-const { width, height } = Dimensions.get("window");
 const GRID_SIZE = 8;
-const BOARD_SIZE = Math.min(width, height); // Ensure board is smaller than the screen size
-const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE;
 
 const ChessGrid: React.FC = () => {
-  const [isOn, setIsOn] = useState<boolean | null>(null); // Manages API state (initially null)
+  const [isOn, setIsOn] = useState<boolean | null>(null);
+  const [boardSize, setBoardSize] = useState<number>(0); // State to hold the board size
+  const SQUARE_SIZE = boardSize / GRID_SIZE;
 
-  // Function to simulate API call (replace with actual API call logic)
   const fetchStatusFromAPI = async () => {
     try {
-      // Simulated API call, replace with actual API request
       const response = await fetch("http://localhost:3801/active", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
       const data = await response.json();
       console.log(data);
-      return data.isOn; // Assume the API returns an object with isOn field
+      return data.isOn; 
     } catch (error) {
       console.error("Failed to fetch API status:", error);
       return null;
@@ -30,60 +26,60 @@ const ChessGrid: React.FC = () => {
   };
 
   useEffect(() => {
+    // Set the board size when the component mounts
+    const newBoardSize = Math.min(window.innerWidth, window.innerHeight);
+    setBoardSize(newBoardSize);
+
     const intervalId = setInterval(async () => {
       const status = await fetchStatusFromAPI();
       setIsOn(status);
-    }, 1000); // Poll every 5 seconds
+    }, 1000);
 
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
   const generateGridData = () => {
     return Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => ({
       id: index.toString(),
-      color:
-        (Math.floor(index / GRID_SIZE) + (index % GRID_SIZE)) % 2 === 0
-          ? "black"
-          : "white",
+      color: (Math.floor(index / GRID_SIZE) + (index % GRID_SIZE)) % 2 === 0 ? "black" : "white",
     }));
   };
 
-  const renderSquare = ({ item }: { item: { id: string; color: string } }) => (
-    <View style={[styles.square, { backgroundColor: item.color }]} />
+  const renderSquare = (item: { id: string; color: string }) => (
+    <div
+      key={item.id}
+      style={{
+        width: `${SQUARE_SIZE}px`,
+        height: `${SQUARE_SIZE}px`,
+        backgroundColor: item.color,
+      }}
+    />
   );
 
   return (
-    <>
+    <div>
       {isOn === null ? (
-        <Text>Loading...</Text>
+        <CalendarExample />
       ) : !isOn ? (
-        <FlatList
-          data={generateGridData()}
-          renderItem={renderSquare}
-          keyExtractor={(item) => item.id}
-          numColumns={GRID_SIZE}
-          scrollEnabled={false}
-          style={styles.grid}
-        />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${GRID_SIZE}, ${SQUARE_SIZE}px)`,
+            gridTemplateRows: `repeat(${GRID_SIZE}, ${SQUARE_SIZE}px)`,
+            justifyContent: "center",
+            alignItems: "center",
+            width: `${boardSize}px`,
+            height: `${boardSize}px`,
+            margin: "auto",
+          }}
+        >
+          {generateGridData().map(renderSquare)}
+        </div>
       ) : (
-        <Text>User is scanned</Text>
+        <p>User is scanned</p>
       )}
-    </>
+    </div>
   );
 };
-
-const styles = StyleSheet.create({
-  grid: {
-    flex: 1,
-    width: BOARD_SIZE, // Set the grid size to be the board size
-    height: BOARD_SIZE, // Ensures the grid is square
-    alignSelf: "center", // Centers the grid in the view
-  },
-  square: {
-    width: SQUARE_SIZE, // Square size based on the grid
-    height: SQUARE_SIZE,
-  },
-});
 
 export default ChessGrid;
