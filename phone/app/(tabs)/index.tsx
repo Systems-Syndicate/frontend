@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { Image, StyleSheet, Platform, Button, View, Modal, TextInput, TouchableOpacity, Switch } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { Alert } from 'react-native';
+import { useState } from 'react';
 import { format, isSameDay } from 'date-fns';
 import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Image, Button, View, Modal, TextInput, TouchableOpacity, Switch } from 'react-native';
+
+import styles from '@/types/styles';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { Alert } from 'react-native';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 interface Event {
-  id: string;
+  uid: string;
   name: string;
   startTime: Date;
   endTime: Date;
@@ -30,8 +32,20 @@ export default function HomeScreen() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); 
   const [isAllDay, setIsAllDay] = useState(false);
 
+  // Function to format date to "YYYYMMDDHHMMSS"
+  const formatUIDDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  };
+
 {/* Function for Saving an Event */}
-const handleSave = () => {
+const handleSave = async () => {
   if (eventName === '') {
     alert('Event name is required.');
     return;
@@ -44,50 +58,145 @@ const handleSave = () => {
 
   // Create the new event object
   const newEvent: Event = {
-      id: `${new Date().getTime()}`, 
+      uid: `${new Date().getTime()}`,
       name: eventName,
-      description: eventDescription,
-      location: eventLocation,
       startTime: isAllDay ? new Date(eventStartTime.setHours(0, 0, 0, 0)) : eventStartTime,
       endTime: isAllDay ? new Date(eventEndTime.setHours(23, 59, 59, 999)) : eventEndTime,
+      description: eventDescription,
+      location: eventLocation,
       isAllDay: isAllDay,
     };
-    
-    setEvents([...events, newEvent]);
-    setModalVisible(false);
-    setEventName('');
-    setEventDescription('');
-    setEventLocation('');
-    setIsAllDay(false);
+
+  // Format the event for the API call
+  const apiEvent = {
+    uid: `${formatUIDDate(newEvent.startTime)}-${newEvent.name}`,
+    name: newEvent.name,
+    begin: newEvent.startTime.toISOString().slice(0, 19).replace('T', ' '),
+    end: newEvent.endTime.toISOString().slice(0, 19).replace('T', ' '),
+    description: newEvent.description,
+    location: newEvent.location,
   };
 
-{/* Function for Deleting an Event */}
-const handleDelete = () => {
-    if (selectedEvent) {
-      Alert.alert(
-        'Confirm Delete',
-        `Are you sure you want to delete "${selectedEvent.name}"?`,
-        [
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Delete cancelled'),
-            style: 'cancel',
-          },
-          {
-            text: 'Delete',
-            onPress: () => {
-              const updatedEvents = events.filter((event) => event.id !== selectedEvent.id);
-              setEvents(updatedEvents);
-              setSelectedEvent(null);
-            },
-          },
-        ],
-        { cancelable: true }
-      );
-    } else {
-      alert('Error: No event selected'); // Handle case where no event is selected
+  console.log('API UID:', apiEvent.uid);
+
+  try {
+    const response = await fetch(`http://192.168.0.6:5000/events/${1}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(apiEvent),
+    });
+
+    if (!response.ok) {
+      console.error('Network response was not ok');
+      throw new Error('Network response was not ok');
     }
-  };
+
+    const result = await response.json();
+    alert(result.message);
+
+  } catch (error) {
+    console.error('Error during fetch:', error);
+    alert('There was a problem saving the event.');
+  }
+
+  setEvents([...events, newEvent]);
+  setModalVisible(false);
+  setEventName('');
+  setEventDescription('');
+  setEventLocation('');
+  setIsAllDay(false);
+};
+
+// {/* Function for Deleting an Event */}
+// const handleDelete = () => {
+//     if (selectedEvent) {
+//       Alert.alert(
+//         'Confirm Delete',
+//         `Are you sure you want to delete "${selectedEvent.name}"?`,
+//         [
+//           {
+//             text: 'Cancel',
+//             onPress: () => console.log('Delete cancelled'),
+//             style: 'cancel',
+//           },
+//           {
+//             text: 'Delete',
+//             onPress: () => {
+//               const updatedEvents = events.filter((event) => event.uid !== selectedEvent.uid);
+//               setEvents(updatedEvents);
+//               setSelectedEvent(null);
+//             },
+//           },
+//         ],
+//         { cancelable: true }
+//       );
+//     } else {
+//       alert('Error: No event selected');
+//     }
+//   };
+
+const handleDelete = async () => {
+  if (selectedEvent) {
+    Alert.alert(
+      'Confirm Delete',
+      `Are you sure you want to delete "${selectedEvent.name}"?`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Delete cancelled'),
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            try {
+              const AESTtoUTC = (date: Date) => {
+                const UTCDate = new Date(date.getTime() - 10 * 60 * 60 * 1000);
+                return UTCDate;
+              }
+              // Convert AEST time to UTC 
+              const utcStartTime = AESTtoUTC(selectedEvent.startTime);
+              const apiUID = `${formatUIDDate(utcStartTime)}-${selectedEvent.name}`;
+              console.log('API UID:', apiUID);
+              
+              // Make DELETE request
+              const response = await fetch(`http://192.168.0.6:5000/events/${1}/${apiUID}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (!response.ok) {
+                console.error('Network response was not ok');
+                throw new Error('Network response was not ok');
+              }
+
+              const result = await response.json();
+              console.log('API response:', result);
+              alert(result.message); // Show success message
+
+              // Update local state
+              const updatedEvents = events.filter((event) => event.uid !== selectedEvent.uid);
+              setEvents(updatedEvents);
+              setSelectedEvent(null); // Clear selected event
+
+            } catch (error) {
+              console.error('Error during fetch:', error);
+              alert('There was a problem deleting the event.');
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  } else {
+    alert('Error: No event selected'); // Handle case where no event is selected
+  }
+};
+
   
 // Function to format the event date and time for display
 const formatDate = (date: Date) => format(date, 'EEE, d MMM');
@@ -117,7 +226,7 @@ const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, even
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
+          source={require('@/assets/images/partial-react-logo.png')} // TODO: Change this to our logo
           style={styles.reactLogo}
         />
       }
@@ -321,128 +430,3 @@ const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, even
     </ParallaxScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-  buttonContainer: {
-    flexDirection: 'column',
-    gap: 10,
-    marginTop: 20,
-  },
-  eventsContainer: {
-    marginTop: 20,
-    gap: 20,
-  },
-  dateSection: {
-    marginBottom: 20,
-  },
-  dateText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  lineSeparator: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginVertical: 10,
-  },
-  eventCard: {
-    padding: 10,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  eventText: {
-    color: 'black',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalView: {
-    width: '80%',
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-    color: '##000000',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-    backgroundColor: 'white',
-  },
-  switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: 10,
-  },
-  rowContainer: {
-    flexDirection: 'row', // Horizontal layout
-    justifyContent: 'space-between', // Space out date and time pickers
-    marginBottom: 10,
-  },
-  pickerContainer: {
-    flex: 1, // Take equal space for both date and time pickers
-    marginHorizontal: 5, // Add some horizontal spacing
-    alignItems: 'center', // Center the text and picker
-  },
-
-  headingText: {
-    color: '##000000', // Change this to your preferred color
-    fontWeight: 'bold', // Optional: make the heading bold
-    fontSize: 24,       // Optional: adjust font size
-  },
-
-  fab: {
-    position: 'absolute',
-    bottom: 30,
-    right: 30,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#007AFF', // Change to your preferred color
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5, // For Android shadow
-    shadowColor: '#000', // For iOS shadow
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  
-});
