@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); 
   const [isAllDay, setIsAllDay] = useState(false);
 
-  {/* Function to format date to "YYYYMMDDHHMMSS" */}
+  {/* Function to format date to "YYYYMMDDHHMMSS" for UID */}
   const formatUIDDate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -204,7 +204,6 @@ export default function HomeScreen() {
       alert('Error: No event selected');
     }
   };
-
   
   // Function to format the event date and time for display
   const formatDate = (date: Date) => format(date, 'EEE, d MMM');
@@ -426,8 +425,8 @@ export default function HomeScreen() {
                   </ThemedText>
 
                   <View style={styles.buttonRow}>
-                  <Button title="Delete" onPress={handleDelete} />
-                  <Button title="Edit" onPress={() => {}} />
+                    <Button title="Delete" onPress={handleDelete} />
+                    <Button title="Edit" onPress={() => {}} />
                     <Button title="Close" onPress={() => setSelectedEvent(null)} />
                   </View>
                 </>
