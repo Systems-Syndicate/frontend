@@ -25,6 +25,8 @@ const ApiContext = createContext<ApiContextProps>({
   setIsOn: () => {},
 });
 
+const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3801";
+
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const [isOn, setIsOn] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
@@ -34,7 +36,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
     const intervalId = setInterval(async () => {
       try {
         // Simulate fetching status from API
-        const response = await fetch("http://localhost:3801/active");
+        const response = await fetch(`${backendURL}/active`);
 
         const data = await response.json();
         setIsOn(data.isOn);
