@@ -21,23 +21,18 @@ export default function Index() {
 
 const Content = () => {
   const { isOn, loggedIn } = useApi(); // Access context states
-
-  // The preview will automatically re-render when isOn or loggedIn changes
-  const preview =
-    (isOn && loggedIn) || (!isOn && loggedIn) ? (
-      <View style={styles.test}>
-        <CalendarListComponent />
-      </View>
-    ) : (
-      <ChessGrid />
-    );
-
+  const bool = (isOn && loggedIn) || (!isOn && loggedIn);
   return (
-    <View style={styles.gridWrapper}>
-      {preview}
-      {/* Display overlay when isOn is false and loggedIn is true */}
+    <>
+      {bool ? (
+        <CalendarListComponent />
+      ) : (
+        <View style={styles.gridWrapper}>
+          <ChessGrid />
+        </View>
+      )}
       {!isOn && loggedIn && <Overlay />}
-    </View>
+    </>
   );
 };
 
@@ -57,8 +52,6 @@ const styles = StyleSheet.create({
   },
   test: {
     flex: 1,
-    width: BOARD_SIZE,
-    height: BOARD_SIZE,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "lightblue",

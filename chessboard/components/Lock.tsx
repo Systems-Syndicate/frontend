@@ -8,10 +8,9 @@ const BOARD_SIZE = Math.min(width, height); // Chessboard size
 const GRID_SIZE = 8; // Chessboard grid size (assuming 8x8 chessboard)
 const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE; // Size of each square
 
-// For the lock, we need to calculate the size and position for the 4x4 grid in the center
-const LOCK_SIZE = SQUARE_SIZE * 4; // The size of the 4x4 area
-const LOCK_POSITION_TOP = SQUARE_SIZE * 2; // Position from top (centered in 4x4 grid)
-const LOCK_POSITION_LEFT = SQUARE_SIZE * 2; // Position from left (centered in 4x4 grid)
+const LOCK_SIZE = SQUARE_SIZE * 4;
+const LOCK_POSITION_TOP = SQUARE_SIZE * 2;
+const LOCK_POSITION_LEFT = SQUARE_SIZE * 2;
 
 const PATTERN_DIMENSION = 3; // Pattern dimension (3x3)
 const CORRECT_UNLOCK_PATTERN = "012345"; // Correct pattern

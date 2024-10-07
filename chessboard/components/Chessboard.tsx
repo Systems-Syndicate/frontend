@@ -2,14 +2,13 @@ import React from "react";
 import { View, StyleSheet, FlatList, Dimensions } from "react-native";
 import { useApi } from "@/components/ApiContext";
 import Lock from "@/components/Lock"; // Assume Lock is the lock component
-import { Text } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 const GRID_SIZE = 8;
 const BOARD_SIZE = Math.min(width, height); // Ensure board is smaller than the screen size
 const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE;
 
-const ChessGrid: React.FC = () => {
+const ChessGrid = () => {
   const { isOn, loggedIn } = useApi(); // Use the API context to get the isOn and loggedIn states
 
   // Identify the center 16 squares (4x4 in the middle of an 8x8 grid)
@@ -37,7 +36,7 @@ const ChessGrid: React.FC = () => {
   };
 
   const renderSquare = ({ item }: { item: { id: string; color: string } }) => (
-    <View style={[styles.square, { backgroundColor: item.color }]} />
+    <View style={[styles.square, { backgroundColor: item.color }]}></View>
   );
 
   return (
@@ -52,12 +51,7 @@ const ChessGrid: React.FC = () => {
           scrollEnabled={false}
           style={styles.grid}
         />
-      ) : loggedIn ? (
-        // State 2: loggedIn True, isOn True -> show a new component
-        <View>
-          <Text> Error: This shouldn't be showing.</Text>
-        </View>
-      ) : (
+      ) : loggedIn ? null : ( // State 2: loggedIn True, isOn True -> show a new component
         // State 1: loggedIn False, isOn True -> show chessboard and lock with center squares yellow
         <>
           <FlatList
@@ -68,7 +62,7 @@ const ChessGrid: React.FC = () => {
             scrollEnabled={false}
             style={styles.grid}
           />
-          <Lock /> {/* Show the lock */}
+          <Lock />
         </>
       )}
     </View>

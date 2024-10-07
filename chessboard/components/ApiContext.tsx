@@ -36,15 +36,9 @@ export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
         // Simulate fetching status from API
         const response = await fetch("http://localhost:3801/active");
 
-        // Check if the response is OK (status code in the range 200–299)
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const data = await response.json();
         setIsOn(data.isOn);
       } catch (error) {
-        console.error("Failed to fetch API status:", error);
         // Set `isOn` to false if the fetch fails, so no error appears in the app
         setIsOn(false);
       }
