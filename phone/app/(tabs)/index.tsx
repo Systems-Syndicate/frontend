@@ -7,16 +7,16 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { Alert } from 'react-native';
 
-// Define the Event type
 interface Event {
-  id: string; // Unique identifier
-  name: string; // Event name
-  startTime: Date; // Start time
-  endTime: Date; // End time
-  isAllDay: boolean; // Flag to indicate if event is all-day
-  description: string; // Event description
-  location: string; // Event location
+  id: string;
+  name: string;
+  startTime: Date;
+  endTime: Date;
+  isAllDay: boolean;
+  description: string;
+  location: string;
 }
 
 export default function HomeScreen() {
@@ -30,20 +30,20 @@ export default function HomeScreen() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); 
   const [isAllDay, setIsAllDay] = useState(false);
 
+{/* Function for Saving an Event */}
+const handleSave = () => {
+  if (eventName === '') {
+    alert('Event name is required.');
+    return;
+  }
 
-  const handleSave = () => {
-    if (eventName === '') {
-      alert('Event name is required.');
-      return;
-    }
+  if (eventEndTime < eventStartTime) {
+    alert('End datetime must be after start datetime.');
+    return;
+  }
 
-    if (eventEndTime <= eventStartTime) {
-      alert('End datetime must be after start datetime.');
-      return;
-    }
-  
-
-    const newEvent: Event = {
+  // Create the new event object
+  const newEvent: Event = {
       id: `${new Date().getTime()}`, 
       name: eventName,
       description: eventDescription,
@@ -52,7 +52,7 @@ export default function HomeScreen() {
       endTime: isAllDay ? new Date(eventEndTime.setHours(23, 59, 59, 999)) : eventEndTime,
       isAllDay: isAllDay,
     };
-  
+    
     setEvents([...events, newEvent]);
     setModalVisible(false);
     setEventName('');
@@ -60,34 +60,57 @@ export default function HomeScreen() {
     setEventLocation('');
     setIsAllDay(false);
   };
-  
 
-  // Function to format the event date and time for display
-  const formatDate = (date: Date) => format(date, 'EEE, d MMM');
-
-  // Function to format time for display
-  const formatTime = (date: Date) => format(date, 'h:mm a');
-
-  // Sort events by start time
-  const sortedEvents = [...events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
-
-  // Group events by date
-  const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, event) => {
-    const startDate = new Date(event.startTime);
-    const endDate = new Date(event.endTime);
-
-    // Iterate through each date from start to end
-    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
-      const dateString = formatDate(new Date(d)); // Format the date to string
-      if (!acc[dateString]) {
-        acc[dateString] = [];
-      }
-      // Push a clone of the event to avoid mutation
-      acc[dateString].push({ ...event });
+{/* Function for Deleting an Event */}
+const handleDelete = () => {
+    if (selectedEvent) {
+      Alert.alert(
+        'Confirm Delete',
+        `Are you sure you want to delete "${selectedEvent.name}"?`,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Delete cancelled'),
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            onPress: () => {
+              const updatedEvents = events.filter((event) => event.id !== selectedEvent.id);
+              setEvents(updatedEvents);
+              setSelectedEvent(null);
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    } else {
+      alert('Error: No event selected'); // Handle case where no event is selected
     }
+  };
+  
+// Function to format the event date and time for display
+const formatDate = (date: Date) => format(date, 'EEE, d MMM');
+const formatTime = (date: Date) => format(date, 'h:mm a');
 
-    return acc;
-  }, {});
+const sortedEvents = [...events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+
+// Group events by date
+const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, event) => {
+  const startDate = new Date(event.startTime);
+  const endDate = new Date(event.endTime);
+
+  // Iterate through each date from start to end
+  for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+    const dateString = formatDate(new Date(d));
+    if (!acc[dateString]) {
+      acc[dateString] = [];
+    }
+    acc[dateString].push({ ...event });
+  }
+
+  return acc;
+}, {});
 
   return (
     <ParallaxScrollView
@@ -122,7 +145,7 @@ export default function HomeScreen() {
         ))}
       </View>
   
-      {/* Circular Button */}
+      {/* Circular Add Button */}
       <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
         <MaterialIcons name="add" size={24} color="white" />
       </TouchableOpacity>
@@ -132,8 +155,7 @@ export default function HomeScreen() {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
+        onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalView}>
           <ThemedText type="title" style={[styles.modalText, styles.headingText]}>Create a New Event</ThemedText>
@@ -285,7 +307,12 @@ export default function HomeScreen() {
                   <ThemedText style={styles.modalText}>
                     Description: {selectedEvent.description}
                   </ThemedText>
-                  <Button title="Close" onPress={() => setSelectedEvent(null)} />
+
+                  <View style={styles.buttonRow}>
+                  <Button title="Delete" onPress={handleDelete} />
+                  <Button title="Edit" onPress={() => {}} />
+                    <Button title="Close" onPress={() => setSelectedEvent(null)} />
+                  </View>
                 </>
               )}
             </View>
@@ -296,6 +323,12 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
