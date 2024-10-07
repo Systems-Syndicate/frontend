@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { format, isSameDay } from 'date-fns';
 import { HelloWave } from '@/components/HelloWave';
 import { ThemedText } from '@/components/ThemedText';
@@ -32,7 +32,7 @@ export default function HomeScreen() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null); 
   const [isAllDay, setIsAllDay] = useState(false);
 
-  // Function to format date to "YYYYMMDDHHMMSS"
+  {/* Function to format date to "YYYYMMDDHHMMSS" */}
   const formatUIDDate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -43,182 +43,190 @@ export default function HomeScreen() {
 
     return `${year}${month}${day}${hours}${minutes}${seconds}`;
   };
+  
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await fetch(`http://192.168.0.6:5000/events/${1}`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const convertUTCToAEST = (date: Date) => {
+          const utcDate = new Date(date);
+          const aestDate = new Date(utcDate.getTime() + 10 * 60 * 60 * 1000);
+        
+          return aestDate;
+        };
+        
+        const fetchedEvents = data.map(event => ({ // No error, still runs all good :)
+          uid: event.uid,
+          name: event.name,
+          startTime: convertUTCToAEST(event.begin),
+          endTime: convertUTCToAEST(event.end),
+          description: event.description,
+          location: event.location,
+          isAllDay: false // TODO: change this to true if the event is all-day
+        }));
+        
 
-{/* Function for Saving an Event */}
-const handleSave = async () => {
-  if (eventName === '') {
-    alert('Event name is required.');
-    return;
-  }
-
-  if (eventEndTime < eventStartTime) {
-    alert('End datetime must be after start datetime.');
-    return;
-  }
-
-  // Create the new event object
-  const newEvent: Event = {
-      uid: `${new Date().getTime()}`,
-      name: eventName,
-      startTime: isAllDay ? new Date(eventStartTime.setHours(0, 0, 0, 0)) : eventStartTime,
-      endTime: isAllDay ? new Date(eventEndTime.setHours(23, 59, 59, 999)) : eventEndTime,
-      description: eventDescription,
-      location: eventLocation,
-      isAllDay: isAllDay,
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+        alert('There was a problem fetching events.');
+      }
     };
 
-  // Format the event for the API call
-  const apiEvent = {
-    uid: `${formatUIDDate(newEvent.startTime)}-${newEvent.name}`,
-    name: newEvent.name,
-    begin: newEvent.startTime.toISOString().slice(0, 19).replace('T', ' '),
-    end: newEvent.endTime.toISOString().slice(0, 19).replace('T', ' '),
-    description: newEvent.description,
-    location: newEvent.location,
+    fetchEvents();
+  }, []);
+
+  {/* Function for Saving an Event */}
+  const handleSave = async () => {
+    if (eventName === '') {
+      alert('Event name is required.');
+      return;
+    }
+
+    if (eventEndTime < eventStartTime) {
+      alert('End datetime must be after start datetime.');
+      return;
+    }
+
+    // Create the new event object
+    const newEvent: Event = {
+        uid: `${new Date().getTime()}`,
+        name: eventName,
+        startTime: isAllDay ? new Date(eventStartTime.setHours(0, 0, 0, 0)) : eventStartTime,
+        endTime: isAllDay ? new Date(eventEndTime.setHours(23, 59, 59, 999)) : eventEndTime,
+        description: eventDescription,
+        location: eventLocation,
+        isAllDay: isAllDay,
+      };
+
+    // Format the event for the API call
+    const apiEvent = {
+      uid: `${formatUIDDate(newEvent.startTime)}-${newEvent.name}`,
+      name: newEvent.name,
+      begin: newEvent.startTime.toISOString().slice(0, 19).replace('T', ' '),
+      end: newEvent.endTime.toISOString().slice(0, 19).replace('T', ' '),
+      description: newEvent.description,
+      location: newEvent.location,
+    };
+
+    // Make POST request
+    try {
+      const response = await fetch(`http://192.168.0.6:5000/events/${1}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiEvent),
+      });
+
+      if (!response.ok) {
+        console.error('Network response was not ok');
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('API response:', result);
+      alert(result.message);
+
+    } catch (error) {
+      console.error('Error during fetch:', error);
+      alert('There was a problem saving the event.');
+    }
+
+    setEvents([...events, newEvent]);
+    setModalVisible(false);
+    setEventName('');
+    setEventDescription('');
+    setEventLocation('');
+    setIsAllDay(false);
+  };
+  
+  {/* Function for Deleting an Event */}
+  const handleDelete = async () => {
+    if (selectedEvent) {
+      Alert.alert(
+        'Confirm Delete',
+        `Are you sure you want to delete "${selectedEvent.name}"?`,
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Delete cancelled'),
+            style: 'cancel',
+          },
+          {
+            text: 'Delete',
+            onPress: async () => {
+              // Make DELETE request
+              try {
+                const AESTtoUTC = (date: Date) => {
+                  const UTCDate = new Date(date.getTime() - 10 * 60 * 60 * 1000);
+                  return UTCDate;
+                }
+
+                // Convert AEST time to UTC - ics file format is UTC time
+                const utcStartTime = AESTtoUTC(selectedEvent.startTime);
+                const apiUID = `${formatUIDDate(utcStartTime)}-${selectedEvent.name}`;
+                
+                const response = await fetch(`http://192.168.0.6:5000/events/${1}/${apiUID}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+
+                if (!response.ok) {
+                  console.error('Network response was not ok');
+                  throw new Error('Network response was not ok');
+                }
+
+                const result = await response.json();
+                console.log('API response:', result);
+                alert(result.message);
+
+                const updatedEvents = events.filter((event) => event.uid !== selectedEvent.uid);
+                setEvents(updatedEvents);
+                setSelectedEvent(null);
+
+              } catch (error) {
+                console.error('Error during fetch:', error);
+                alert('There was a problem deleting the event.');
+              }
+            },
+          },
+        ],
+        { cancelable: true }
+      );
+    } else {
+      alert('Error: No event selected');
+    }
   };
 
-  console.log('API UID:', apiEvent.uid);
-
-  try {
-    const response = await fetch(`http://192.168.0.6:5000/events/${1}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(apiEvent),
-    });
-
-    if (!response.ok) {
-      console.error('Network response was not ok');
-      throw new Error('Network response was not ok');
-    }
-
-    const result = await response.json();
-    alert(result.message);
-
-  } catch (error) {
-    console.error('Error during fetch:', error);
-    alert('There was a problem saving the event.');
-  }
-
-  setEvents([...events, newEvent]);
-  setModalVisible(false);
-  setEventName('');
-  setEventDescription('');
-  setEventLocation('');
-  setIsAllDay(false);
-};
-
-// {/* Function for Deleting an Event */}
-// const handleDelete = () => {
-//     if (selectedEvent) {
-//       Alert.alert(
-//         'Confirm Delete',
-//         `Are you sure you want to delete "${selectedEvent.name}"?`,
-//         [
-//           {
-//             text: 'Cancel',
-//             onPress: () => console.log('Delete cancelled'),
-//             style: 'cancel',
-//           },
-//           {
-//             text: 'Delete',
-//             onPress: () => {
-//               const updatedEvents = events.filter((event) => event.uid !== selectedEvent.uid);
-//               setEvents(updatedEvents);
-//               setSelectedEvent(null);
-//             },
-//           },
-//         ],
-//         { cancelable: true }
-//       );
-//     } else {
-//       alert('Error: No event selected');
-//     }
-//   };
-
-const handleDelete = async () => {
-  if (selectedEvent) {
-    Alert.alert(
-      'Confirm Delete',
-      `Are you sure you want to delete "${selectedEvent.name}"?`,
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Delete cancelled'),
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: async () => {
-            try {
-              const AESTtoUTC = (date: Date) => {
-                const UTCDate = new Date(date.getTime() - 10 * 60 * 60 * 1000);
-                return UTCDate;
-              }
-              // Convert AEST time to UTC 
-              const utcStartTime = AESTtoUTC(selectedEvent.startTime);
-              const apiUID = `${formatUIDDate(utcStartTime)}-${selectedEvent.name}`;
-              console.log('API UID:', apiUID);
-              
-              // Make DELETE request
-              const response = await fetch(`http://192.168.0.6:5000/events/${1}/${apiUID}`, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              });
-
-              if (!response.ok) {
-                console.error('Network response was not ok');
-                throw new Error('Network response was not ok');
-              }
-
-              const result = await response.json();
-              console.log('API response:', result);
-              alert(result.message); // Show success message
-
-              // Update local state
-              const updatedEvents = events.filter((event) => event.uid !== selectedEvent.uid);
-              setEvents(updatedEvents);
-              setSelectedEvent(null); // Clear selected event
-
-            } catch (error) {
-              console.error('Error during fetch:', error);
-              alert('There was a problem deleting the event.');
-            }
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  } else {
-    alert('Error: No event selected'); // Handle case where no event is selected
-  }
-};
-
   
-// Function to format the event date and time for display
-const formatDate = (date: Date) => format(date, 'EEE, d MMM');
-const formatTime = (date: Date) => format(date, 'h:mm a');
+  // Function to format the event date and time for display
+  const formatDate = (date: Date) => format(date, 'EEE, d MMM');
+  const formatTime = (date: Date) => format(date, 'h:mm a');
 
-const sortedEvents = [...events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+  const sortedEvents = [...events].sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
 
-// Group events by date
-const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, event) => {
-  const startDate = new Date(event.startTime);
-  const endDate = new Date(event.endTime);
+  // Group events by date
+  const groupedEvents = sortedEvents.reduce((acc: { [key: string]: Event[] }, event) => {
+    const startDate = new Date(event.startTime);
+    const endDate = new Date(event.endTime);
 
-  // Iterate through each date from start to end
-  for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
-    const dateString = formatDate(new Date(d));
-    if (!acc[dateString]) {
-      acc[dateString] = [];
+    // Iterate through each date from start to end
+    for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+      const dateString = formatDate(new Date(d));
+      if (!acc[dateString]) {
+        acc[dateString] = [];
+      }
+      acc[dateString].push({ ...event });
     }
-    acc[dateString].push({ ...event });
-  }
 
-  return acc;
+    return acc;
 }, {});
 
   return (
