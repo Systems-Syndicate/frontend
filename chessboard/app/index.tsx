@@ -4,6 +4,7 @@ import React from "react";
 import ChessGrid from "@/components/Chessboard";
 import { ApiProvider, useApi } from "@/components/ApiContext"; // Combine imports
 import Overlay from "@/components/Overlay"; // Import the overlay component
+import CalendarListComponent from "@/components/Calendar"; // Import the calendar component
 
 const { width, height } = Dimensions.get("window");
 const BOARD_SIZE = Math.min(width, height);
@@ -25,7 +26,7 @@ const Content = () => {
   const preview =
     (isOn && loggedIn) || (!isOn && loggedIn) ? (
       <View style={styles.test}>
-        <Text>You are logged in! YAY</Text>
+        <CalendarListComponent />
       </View>
     ) : (
       <ChessGrid />
