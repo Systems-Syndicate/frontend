@@ -13,6 +13,7 @@ import DailyView from './(hamburger)/daily_view';
 import MonthlyView from './(hamburger)/monthly_view';
 import CreateEvent from './(hamburger)/create_event';
 import GetDimensions from './(hamburger)/get_dimensions';
+import AnotherView from './(hamburger)/anotherView'
 
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
@@ -98,8 +99,9 @@ export default function App() {
           <Drawer.Screen name="Home" component={HomeScreen} initialParams={{ dimensions }} />
           <Drawer.Screen name="Notifications" component={GetDimensions} initialParams={{ dimensions }} />
           <Drawer.Screen name="DailyView" component={DailyView} />
-        <Drawer.Screen name="MonthlyView" component={MonthlyView} initialParams={{ dimensions }} />
+          <Drawer.Screen name="MonthlyView" component={MonthlyView} initialParams={{ dimensions }} />
           <Drawer.Screen name="CreateEvent" component={CreateEvent} />
+          <Drawer.Screen name="AnotherView" component={AnotherView} />
       </Drawer.Navigator>
     </ThemeProvider>
   );
