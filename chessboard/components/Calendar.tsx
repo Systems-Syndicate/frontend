@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   Modal,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import {
   CalendarList,
@@ -24,62 +25,33 @@ const INITIAL_TIME = { hour: 9, minutes: 0 };
 
 // Define types for Event and EventsByDate
 interface Event {
-  id: string;
-  start: string;
+  color: string;
   end: string;
+  id: string;
+  location: string;
+  start: string;
+  summary: string;
   title: string;
-  color?: string;
   user: string;
-  summary?: string;
 }
 
 interface EventsByDate {
   [key: string]: Event[];
 }
 
-// Mock events directly in the component
-const EVENTS: Event[] = [
-  {
-    id: "1",
-    start: "2024-10-08T09:00:00",
-    end: "2024-10-08T10:00:00",
-    title: "Event 1",
-    color: "pink",
-    user: "user1",
-  },
-  {
-    id: "5",
-    start: "2024-10-08T09:00:00",
-    end: "2024-10-08T10:00:00",
-    title: "Event 2321",
-    summary: "This is a summary of the event as a test",
-    color: "#3677FF",
-    user: "user2",
-  },
-  {
-    id: "6",
-    start: "2024-10-08T09:00:00",
-    end: "2024-10-08T10:00:00",
-    title: "Event 6969",
-    color: "orange",
-    user: "user3",
-  },
-  {
-    id: "2",
-    start: "2024-10-08T11:00:00",
-    end: "2024-10-08T12:00:00",
-    title: "Event 2",
-    color: "pink",
-    user: "user1",
-  },
-  {
-    id: "3",
-    start: "2024-10-09T09:00:00",
-    end: "2024-10-09T10:00:00",
-    title: "Event 3",
-    user: "user1",
-  },
-];
+const fetchEvents = async (): Promise<Event[]> => {
+  try {
+    const response = await fetch("http://localhost:3801/events/123456");
+    if (!response.ok) {
+      throw new Error("Failed to fetch events");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+};
 
 const parseEventsToMarkedDates = (events: Event[]) => {
   const markedDates: {
@@ -89,8 +61,8 @@ const parseEventsToMarkedDates = (events: Event[]) => {
   } = {};
 
   events.forEach((event) => {
-    const { start, color, title, user } = event;
-    const eventDate = start.split("T")[0];
+    const { color, end, id, location, start, summary, title, user } = event;
+    const eventDate = start.split(" ")[0];
     const dot = {
       key: user, // Use user as the key to avoid duplicates for the same user
       color: color || "gray",
@@ -111,6 +83,7 @@ const parseEventsToMarkedDates = (events: Event[]) => {
       markedDates[eventDate].dots.push(dot);
     }
   });
+  console.log(markedDates);
 
   return markedDates;
 };
@@ -143,8 +116,28 @@ const CalendarTimelineComponent: React.FC = () => {
   );
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [markedDates, setMarkedDates] = useState<{ [key: string]: any }>({});
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const eventsByDate = groupEventsByDate(EVENTS);
+  useEffect(() => {
+    const loadEvents = async () => {
+      const fetchedEvents = await fetchEvents();
+      setEvents(fetchedEvents);
+      setLoading(false);
+    };
+
+    loadEvents();
+  }, []);
+
+  // Update markedDates whenever events are updated
+  useEffect(() => {
+    const newMarkedDates = parseEventsToMarkedDates(events);
+    setMarkedDates(newMarkedDates);
+    console.log(markedDates);
+  }, [events]);
+
+  const eventsByDate = groupEventsByDate(events);
 
   const handleDayPress = (day: { dateString: string }) => {
     setSelectedDay(day.dateString);
@@ -175,6 +168,10 @@ const CalendarTimelineComponent: React.FC = () => {
     ],
     onEventPress: handleEventPress,
   };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -227,7 +224,7 @@ const CalendarTimelineComponent: React.FC = () => {
           calendarHeight={BOARD_SIZE}
           onDayPress={handleDayPress}
           markingType={"multi-dot"}
-          markedDates={parseEventsToMarkedDates(EVENTS)}
+          markedDates={markedDates} // Use updated markedDates
         />
       )}
     </View>
