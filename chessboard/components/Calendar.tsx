@@ -41,9 +41,11 @@ interface EventsByDate {
   [key: string]: Event[];
 }
 
+const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3801";
+
 const fetchEvents = async (): Promise<Event[]> => {
   try {
-    const response = await fetch("http://localhost:3801/events/ics/all");
+    const response = await fetch(`${backendURL}/events/ics/all`);
     if (!response.ok) {
       throw new Error("Failed to fetch events");
     }
@@ -66,7 +68,7 @@ const parseEventsToMarkedDates = (events: Event[]) => {
     const { color, end, id, location, start, summary, title, user } = event;
     const eventDate = start.split(" ")[0];
     const dot = {
-      key: user, // Use user as the key to avoid duplicates for the same user
+      key: color, // Use user as the key to avoid duplicates for the same user
       color: color || "gray",
       selectedDotColor: color || "gray",
     };
@@ -85,7 +87,6 @@ const parseEventsToMarkedDates = (events: Event[]) => {
       markedDates[eventDate].dots.push(dot);
     }
   });
-  console.log(markedDates);
 
   return markedDates;
 };
@@ -140,7 +141,6 @@ const CalendarTimelineComponent: React.FC = () => {
   useEffect(() => {
     const newMarkedDates = parseEventsToMarkedDates(events);
     setMarkedDates(newMarkedDates);
-    console.log(markedDates);
   }, [events]);
 
   const eventsByDate = groupEventsByDate(events);
