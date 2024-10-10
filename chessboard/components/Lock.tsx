@@ -1,71 +1,90 @@
-import React from "react";
-import { StyleSheet, Dimensions, View } from "react-native";
-import { GeneralPatternLock } from "react-native-patternlock-authentication";
+import React, { useState } from "react";
+import { StyleSheet, Dimensions, View, TouchableOpacity } from "react-native";
 import { useApi } from "@/components/ApiContext"; // Import useApi to access context
 
 const { width, height } = Dimensions.get("window");
 const BOARD_SIZE = Math.min(width, height); // Chessboard size
-const GRID_SIZE = 8; // Chessboard grid size (assuming 8x8 chessboard)
-const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE; // Size of each square
+const GRID_SIZE = 8; // Chessboard grid size (8x8)
+const PIN_GRID_SIZE = 4; // Lock pattern grid size (4x4)
+const SQUARE_SIZE = BOARD_SIZE / GRID_SIZE; // Size of each chess square
 
-const LOCK_SIZE = SQUARE_SIZE * 4;
-const LOCK_POSITION_TOP = SQUARE_SIZE * 2;
-const LOCK_POSITION_LEFT = SQUARE_SIZE * 2;
-
-const PATTERN_DIMENSION = 3; // Pattern dimension (3x3)
-const CORRECT_UNLOCK_PATTERN = "012345"; // Correct pattern
+const CORRECT_PIN_SEQUENCE = [18, 19, 26, 27]; // Example: correct pattern based on the 4x4 center squares
 
 const Lock: React.FC = () => {
   const { setLoggedIn } = useApi(); // Access setLoggedIn from the context
+  const [selectedSquares, setSelectedSquares] = useState<number[]>([]); // Track selected squares
 
-  const onPatternMatch = () => {
-    // Set loggedIn to true when the correct pattern is matched
-    setLoggedIn(true);
+  // Handle square press
+  const handleSquarePress = (index: number) => {
+    if (!selectedSquares.includes(index) && selectedSquares.length < 4) {
+      const newSelectedSquares = [...selectedSquares, index];
+      setSelectedSquares(newSelectedSquares);
+
+      // Check if the selected sequence matches the correct pin
+      if (newSelectedSquares.length === 4) {
+        if (
+          JSON.stringify(newSelectedSquares) ===
+          JSON.stringify(CORRECT_PIN_SEQUENCE)
+        ) {
+          setLoggedIn(true); // Unlock if correct
+        } else {
+          resetPin(); // Reset if incorrect
+        }
+      }
+    }
   };
 
-  const onWrongPattern = () => {
-    // Handle wrong pattern
+  // Reset the selected pin sequence
+  const resetPin = () => {
+    setSelectedSquares([]);
   };
 
-  const onPatternMatchAfterDelay = () => {
-    // Handle delayed pattern match
+  // Generate the color for each square in the lock pattern based on its index
+  const generateSquareColor = (index: number) => {
+    // Get the position of the square within the 8x8 chessboard grid
+    const row = Math.floor(index / GRID_SIZE);
+    const col = index % GRID_SIZE;
+
+    // Alternating chessboard color logic
+    const isBlackSquare = (row + col) % 2 === 0;
+    const defaultColor = isBlackSquare ? "black" : "white";
+
+    return selectedSquares.includes(index) ? "yellow" : defaultColor; // Change color when selected
   };
 
-  const onWrongPatternAfterDelay = () => {
-    // Handle delayed wrong pattern
-  };
+  // Render the lock pattern grid (4x4 center squares in the chessboard)
+  const renderGrid = () => {
+    // Center 4x4 squares of the 8x8 chessboard
+    const centerSquares = [
+      18, 19, 20, 21, 26, 27, 28, 29, 34, 35, 36, 37, 42, 43, 44, 45,
+    ];
 
-  return (
-    <View style={styles.lockContainer}>
-      <GeneralPatternLock
-        containerDimension={PATTERN_DIMENSION}
-        containerWidth={LOCK_SIZE}
-        containerHeight={LOCK_SIZE}
-        correctPattern={CORRECT_UNLOCK_PATTERN}
-        dotsAndLineColor="#380102"
-        defaultDotRadius={10}
-        snapDotRadius={15}
-        snapDuration={100}
-        lineStrokeWidth={5}
-        wrongPatternColor="red"
-        matchedPatternColor="green"
-        onPatternMatch={onPatternMatch} // Use the new pattern match handler
-        onWrongPatternAfterDelay={onWrongPatternAfterDelay}
-        onPatternMatchAfterDelay={onPatternMatchAfterDelay}
-        onWrongPattern={onWrongPattern}
+    return centerSquares.map((index) => (
+      <TouchableOpacity
+        key={index}
+        style={[styles.square, { backgroundColor: generateSquareColor(index) }]}
+        onPress={() => handleSquarePress(index)}
       />
-    </View>
-  );
+    ));
+  };
+
+  return <View style={styles.lockContainer}>{renderGrid()}</View>;
 };
 
 const styles = StyleSheet.create({
   lockContainer: {
     position: "absolute", // Overlay on the chessboard
-    top: LOCK_POSITION_TOP, // Position the lock in the center 4x4 squares
-    left: LOCK_POSITION_LEFT, // Same for the left position
-    width: LOCK_SIZE, // Ensure the size fits the 4x4 grid
-    height: LOCK_SIZE, // Ensure the height matches the width
+    top: SQUARE_SIZE * 2, // Position the lock in the center 4x4 squares
+    left: SQUARE_SIZE * 2,
+    width: SQUARE_SIZE * PIN_GRID_SIZE, // Ensure the lock fits the 4x4 grid
+    height: SQUARE_SIZE * PIN_GRID_SIZE,
     zIndex: 1, // Ensure it is above the chessboard
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  square: {
+    width: SQUARE_SIZE, // Each square size
+    height: SQUARE_SIZE,
   },
 });
 

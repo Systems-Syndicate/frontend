@@ -20,6 +20,8 @@ import {
 
 const { width, height } = Dimensions.get("window");
 const BOARD_SIZE = Math.min(width, height); // Ensure board is smaller than the screen size
+const BASE_SIZE = 400; // Base size for scaling, adjust this value if needed
+const relativeFontSize = (size: number) => (size * BOARD_SIZE) / BASE_SIZE;
 
 const INITIAL_TIME = { hour: 9, minutes: 0 };
 
@@ -228,6 +230,7 @@ const CalendarTimelineComponent: React.FC = () => {
           calendarHeight={BOARD_SIZE}
           onDayPress={handleDayPress}
           markingType={"multi-dot"}
+          theme={theme}
           markedDates={markedDates} // Use updated markedDates
         />
       )}
@@ -238,8 +241,6 @@ const CalendarTimelineComponent: React.FC = () => {
 // Styles
 const styles = StyleSheet.create({
   container: {
-    width: BOARD_SIZE,
-    height: BOARD_SIZE,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -250,6 +251,7 @@ const styles = StyleSheet.create({
   calendar: {
     width: BOARD_SIZE,
     height: BOARD_SIZE,
+    backgroundColor: "white",
   },
   modalOverlay: {
     flex: 1,
@@ -279,5 +281,27 @@ const styles = StyleSheet.create({
     color: "white",
   },
 });
+
+const theme = {
+  backgroundColor: "#ffffff", // Overall background
+  calendarBackground: "#ffffff", // Calendar background
+  textSectionTitleColor: "#b6c1cd", // Color of day titles (Sun, Mon, etc.)
+  selectedDayBackgroundColor: "#00adf5", // Background color of selected day
+  selectedDayTextColor: "#ffffff", // Text color of selected day
+  todayTextColor: "#48BFE3", // Text color of today
+  dayTextColor: "#2d4150", // Regular day text color
+  textDisabledColor: "#d9e1e8", // Disabled day text color
+  dotColor: "#00adf5", // Event dot color
+  selectedDotColor: "#ffffff", // Selected dot color
+  arrowColor: "#48BFE3", // Color of the arrows
+  monthTextColor: "#48BFE3", // Month text color in header
+  indicatorColor: "#48BFE3", // Loading indicator color
+  textDayFontWeight: "300", // Font weight of day numbers
+  textMonthFontWeight: "bold", // Font weight of month in header
+  textDayHeaderFontWeight: "600", // Font weight of day headers (Sun, Mon, etc.)
+  textDayFontSize: relativeFontSize(15), // Font size of day numbers
+  textMonthFontSize: relativeFontSize(24), // Font size of month
+  textDayHeaderFontSize: relativeFontSize(18), // Font size of day headers
+};
 
 export default CalendarTimelineComponent;
