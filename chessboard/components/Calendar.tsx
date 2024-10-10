@@ -41,7 +41,7 @@ interface EventsByDate {
 
 const fetchEvents = async (): Promise<Event[]> => {
   try {
-    const response = await fetch("http://localhost:3801/events/123456");
+    const response = await fetch("http://localhost:3801/events/ics/all");
     if (!response.ok) {
       throw new Error("Failed to fetch events");
     }
@@ -127,7 +127,11 @@ const CalendarTimelineComponent: React.FC = () => {
       setLoading(false);
     };
 
-    loadEvents();
+    // Set an interval to call loadEvents every second
+    const interval = setInterval(loadEvents, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(interval);
   }, []);
 
   // Update markedDates whenever events are updated
