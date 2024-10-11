@@ -12,6 +12,7 @@ function getFutureDates(numberOfDays: number) {
   const array: string[] = [];
   for (let index = 1; index <= numberOfDays; index++) {
     let d = Date.now();
+    
     if (index > 8) {
       // set dates on the next month
       const newMonth = new Date(d).getMonth() + 1;
@@ -31,26 +32,23 @@ function getPastDate(numberOfDays: number) {
 export const agendaItems = [
   {
     title: dates[0],
-    data: [{hour: '12am', duration: '1h', title: 'First Yoga'}, {hour: '9am', duration: '1h', title: 'Long Yoga', itemCustomHeightType: 'LongEvent'}],
+    data: [{hour: '9am', duration: '1h', title: 'Arlecchino Boss'}],
   },
   {
     title: dates[1],
     data: [
-      {hour: '4pm', duration: '1h', title: 'Pilates ABC'},
-      {hour: '5pm', duration: '1h', title: 'Vinyasa Yoga'}
+      {hour: '4pm', duration: '8h', title: 'Aranara Quest'}
     ]
   },
   {
     title: dates[2],
     data: [
-      {hour: '1pm', duration: '1h', title: 'Ashtanga Yoga'},
-      {hour: '2pm', duration: '1h', title: 'Deep Stretches'},
-      {hour: '3pm', duration: '1h', title: 'Private Yoga'}
+      {hour: '1pm', duration: '2h', title: 'Furina Story Quest'}
     ]
   },
   {
     title: dates[3],
-    data: [{hour: '12am', duration: '1h', title: 'Ashtanga Yoga'}]
+    data: [{hour: '12am', duration: '1h', title: 'Collecting Brilliant Chrysanthemum'}]
   },
   {
     title: dates[4],
@@ -59,16 +57,14 @@ export const agendaItems = [
   {
     title: dates[5],
     data: [
-      {hour: '9pm', duration: '1h', title: 'Middle Yoga'},
-      {hour: '10pm', duration: '1h', title: 'Ashtanga'},
-      {hour: '11pm', duration: '1h', title: 'TRX'},
-      {hour: '12pm', duration: '1h', title: 'Running Group'}
+      {hour: '10am', duration: '1h', title: 'Petting the Saurians'},
+      {hour: '9pm', duration: '1h', title: 'Slapping SSADC'},
     ]
   },
   {
     title: dates[6],
     data: [
-      {hour: '12am', duration: '1h', title: 'Ashtanga Yoga'}
+      {hour: '11am', duration: '3h', title: 'Building the motorbike for Mauvika'},
     ]
   },
   {
@@ -78,44 +74,39 @@ export const agendaItems = [
   {
     title: dates[8],
     data: [
-      {hour: '9pm', duration: '1h', title: 'Pilates Reformer'},
-      {hour: '10pm', duration: '1h', title: 'Ashtanga'},
-      {hour: '11pm', duration: '1h', title: 'TRX'},
-      {hour: '12pm', duration: '1h', title: 'Running Group'}
+      {hour: '9pm', duration: '1h', title: 'Vibing with Xilonen'},
     ]
   },
   {
     title: dates[9],
     data: [
-      {hour: '1pm', duration: '1h', title: 'Ashtanga Yoga'},
-      {hour: '2pm', duration: '1h', title: 'Deep Stretches'},
-      {hour: '3pm', duration: '1h', title: 'Private Yoga'}
+      {hour: '1pm', duration: '1h', title: 'Swinging among the treetops with Kinich'},
+      {hour: '2pm', duration: '1h', title: 'Gunslinging with Chasca'}
     ]
   },
   {
     title: dates[10],
     data: [
-      {hour: '12am', duration: '1h', title: 'Last Yoga'}
+      {hour: '3pm', duration: '1h', title: 'Soaking in the hot spring with Mualani'}
     ]
   },
   {
     title: dates[11],
     data: [
-      {hour: '1pm', duration: '1h', title: 'Ashtanga Yoga'},
-      {hour: '2pm', duration: '1h', title: 'Deep Stretches'},
-      {hour: '3pm', duration: '1h', title: 'Private Yoga'}
+      {hour: '10pm', duration: '1h', title: 'Feeding the saurians with Kachina'}
     ]
   },
   {
     title: dates[12],
     data: [
-      {hour: '12am', duration: '1h', title: 'Last Yoga'}
+      
+      {hour: '9am', duration: '2h', title: 'Surfing with Mualani'}
     ]
   },
   {
     title: dates[13],
     data: [
-      {hour: '12am', duration: '1h', title: 'Last item of the list'}
+      {hour: '12am', duration: '4h', title: 'Natlan Archon Quest'}
     ]
   }
 ];
@@ -133,9 +124,9 @@ interface ItemProps {
 const AgendaItem = (props: ItemProps) => {
   const {item} = props;
 
-  const buttonPressed = useCallback(() => {
-    Alert.alert('Show me more');
-  }, []);
+  // const buttonPressed = useCallback(() => {
+  //   Alert.alert('Show me more');
+  // }, []);
 
   const itemPressed = useCallback(() => {
     Alert.alert(item.title);
@@ -156,9 +147,12 @@ const AgendaItem = (props: ItemProps) => {
         <Text style={styles.itemDurationText}>{item.duration}</Text>
       </View>
       <Text style={styles.itemTitleText}>{item.title}</Text>
-      <View style={styles.itemButtonContainer}>
+      
+
+      {/* <View style={styles.itemButtonContainer}>
         <Button color={'grey'} title={'Info'} onPress={buttonPressed}/>
-      </View>
+      </View> */}
+
     </TouchableOpacity>
   );
 };
@@ -180,13 +174,6 @@ const ExpandableCalendarScreen = (props: Props) => {
             showTodayButton
             theme={todayBtnTheme.current}
         >
-            {weekView ? (
-                <WeekCalendar firstDay={1}  />
-            ) : (
-                <ExpandableCalendar
-                    firstDay={1}
-                />
-            )}
             <AgendaList
                 sections={ITEMS}
                 renderItem={renderItem}
@@ -211,13 +198,13 @@ const styles = StyleSheet.create({
     },
     item: {
     padding: 20,
-    backgroundColor: 'white',
+    backgroundColor: 'black',
     borderBottomWidth: 1,
     borderBottomColor: 'lightgrey',
     flexDirection: 'row'
     },
     itemHourText: {
-        color: 'black'
+        color: 'white'
     },
     itemDurationText: {
         color: 'grey',
@@ -226,7 +213,7 @@ const styles = StyleSheet.create({
         marginLeft: 4
     },
     itemTitleText: {
-        color: 'black',
+        color: 'white',
         marginLeft: 16,
         fontWeight: 'bold',
         fontSize: 16
