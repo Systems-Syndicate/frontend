@@ -13,7 +13,6 @@ export default function GetDimensions({ route, navigation }) {
             <ThemedText style={{ fontSize: 12, marginVertical: 10 }}>{JSON.stringify(dimensions['window'])}</ThemedText>
             <ThemedText style={{ fontSize: 12, marginVertical: 10 }}>Screen Dimensions: </ThemedText>
             <ThemedText style={{ fontSize: 12, marginVertical: 10 }}>{JSON.stringify(dimensions['screen'])}</ThemedText>
-
         </ThemedView>
     );
 }

@@ -15,5 +15,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/notification.js", "app/home.js", "app/index.js", "app/(hamburger)/create_event.tsx", "app/(hamburger)/daily_view.js"  ]
+, "app/notification.js", "app/home.js", "app/index.js", "app/(hamburger)/create_event.tsx", "app/archived/daily_view.js"  ]
 }

@@ -9,6 +9,7 @@ import styles from '@/types/styles';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
 
 interface Event {
   uid: string;
@@ -22,7 +23,7 @@ interface Event {
 
 const backendURL = "http://192.168.64.223:3801/events/123456";
 
-export default function HomeScreen() {
+export default function CreateEvent() {
   const [modalVisible, setModalVisible] = useState(false);
   const [eventName, setEventName] = useState('');
   const [eventDescription, setEventDescription] = useState('');
@@ -243,6 +244,10 @@ export default function HomeScreen() {
       <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
         <MaterialIcons name="add" size={24} color="white" />
       </TouchableOpacity>
+
+      <View style={{ backgroundColor: 'white', height: 120}}>
+        <Image source={require('@/assets/images/icon.png')} style={{left: 20, height: 120, width: 220}} ></Image>
+      </View> 
 
       <ScrollView>
         {/* Render Grouped Events */}
