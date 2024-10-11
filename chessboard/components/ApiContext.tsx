@@ -25,7 +25,7 @@ const ApiContext = createContext<ApiContextProps>({
   setIsOn: () => {},
 });
 
-const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3801";
+const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.64.223:3801";
 
 export const ApiProvider: React.FC<ApiProviderProps> = ({ children }) => {
   const [isOn, setIsOn] = useState(false);

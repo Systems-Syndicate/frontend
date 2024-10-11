@@ -1,5 +1,5 @@
 // Index.tsx
-import { Text, View, SafeAreaView, StyleSheet, Dimensions } from "react-native";
+import { Text, View, SafeAreaView, StyleSheet, Dimensions, StatusBar } from "react-native";
 import React from "react";
 import ChessGrid from "@/components/Chessboard";
 import { ApiProvider, useApi } from "@/components/ApiContext"; // Combine imports
@@ -12,6 +12,7 @@ const BOARD_SIZE = Math.min(width, height);
 export default function Index() {
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar hidden={true}/>
       <ApiProvider>
         <Content />
       </ApiProvider>

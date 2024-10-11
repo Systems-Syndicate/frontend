@@ -41,7 +41,7 @@ interface EventsByDate {
   [key: string]: Event[];
 }
 
-const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3801";
+const backendURL = process.env.EXPO_PUBLIC_API_URL || "http://192.168.64.223:3801";
 
 const fetchEvents = async (): Promise<Event[]> => {
   try {
@@ -68,7 +68,7 @@ const parseEventsToMarkedDates = (events: Event[]) => {
     const { color, end, id, location, start, summary, title, user } = event;
     const eventDate = start.split(" ")[0];
     const dot = {
-      key: color, // Use user as the key to avoid duplicates for the same user
+      key: id, // Use user as the key to avoid duplicates for the same user
       color: color || "gray",
       selectedDotColor: color || "gray",
     };
@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   calendar: {
     width: BOARD_SIZE,
     height: BOARD_SIZE,
-    backgroundColor: "white",
+    backgroundColor: "black",
   },
   modalOverlay: {
     flex: 1,
