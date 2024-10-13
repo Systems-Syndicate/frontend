@@ -21,7 +21,7 @@ interface Event {
   location: string;
 }
 
-const backendURL = "http://192.168.64.223:3801/events/123456";
+const backendURL = "http://172.16.10.240:3801/events/123456";
 
 export default function CreateEvent() {
   const [modalVisible, setModalVisible] = useState(false);
@@ -50,7 +50,7 @@ export default function CreateEvent() {
     const fetchEvents = async () => {
       try {
         // const response = await fetch(`http://192.168.0.6:5000/events/${1}`);
-        const response = await fetch(`http://192.168.64.223:3801/events/123456`);
+        const response = await fetch(backendURL);
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -122,7 +122,7 @@ export default function CreateEvent() {
     // Make POST request
     try {
       // const response = await fetch(`http://192.168.0.6:5000/events/${1}`, {
-      const response = await fetch(`http://192.168.64.223:3801/events/123456`, {
+      const response = await fetch(backendURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ export default function CreateEvent() {
                 console.log("APIUID", apiUID);
                 
                 // const response = await fetch(`http://192.168.0.6:5000/events/${1}/${apiUID}`, {
-                const response = await fetch(`http://192.168.64.223:3801/events/123456/${apiUID}`, {
+                const response = await fetch(`${backendURL}/${apiUID}`, {
                   method: 'DELETE',
                   headers: {
                     'Content-Type': 'application/json',

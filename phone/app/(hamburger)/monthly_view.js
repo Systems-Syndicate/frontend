@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react'; 
 import { StyleSheet, SafeAreaView, View } from 'react-native';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import moment from "moment";
 import { Calendar, CalendarList } from 'react-native-calendars';
 
 

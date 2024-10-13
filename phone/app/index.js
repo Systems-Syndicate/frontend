@@ -1,33 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Button, View, Dimensions, Image } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { ThemedView } from '@/components/ThemedView';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
-// import DailyView from './(hamburger)/daily_view';
-// import MonthlyView from './(hamburger)/monthly_view';
 import CreateEvent from './(hamburger)/create_event';
 import GetDimensions from './(hamburger)/get_dimensions';
-// import AnotherView from './(hamburger)/anotherView'
+import DateTimePickerAndroid from './(hamburger)/create_event_android';
+import MonthlyView from './(hamburger)/monthly_view';
 
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
-
-function HomeScreen({ route, navigation }) {
-
-  const { dimensions } = route.params;
-
-  return (
-      <View style={{ backgroundColor: 'white', height: 120}}>
-        <Image source={require('@/assets/images/icon.png')} style={{left: 20, height: 120, width: 220}} ></Image>
-      </View>   
-  );
-}
 
 const Drawer = createDrawerNavigator();
 
@@ -59,7 +46,7 @@ export default function App() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar backgroundColor={colorScheme === 'dark' ? 'black' : 'white'} hidden={false} animated={true} />
-      <Drawer.Navigator initialRouteName="CreateEvent"
+      <Drawer.Navigator initialRouteName="CreateEvent"  // set Create Event as default landing tab
         screenOptions={({ navigation }) => ({
           headerStatusBarHeight: 4,
           drawerType: "front", 
@@ -91,12 +78,13 @@ export default function App() {
             color: colorScheme === 'dark' ? 'white' : DefaultTheme,
           }
         })}>
-          <Drawer.Screen name="Home" component={HomeScreen} initialParams={{ dimensions }} />
-          <Drawer.Screen name="CreateEvent" component={CreateEvent} />
-          {/* <Drawer.Screen name="DailyView" component={DailyView} /> */}
-          {/* <Drawer.Screen name="MonthlyView" component={MonthlyView} initialParams={{ dimensions }} /> */}
-          {/* <Drawer.Screen name="AnotherView" component={AnotherView} /> */}
+          {/* <Drawer.Screen name="Home" component={HomeScreen} initialParams={{ dimensions }} /> */}
+          <Drawer.Screen name="Create Event" component={CreateEvent} />
+          <Drawer.Screen name="Create Event alt." component={DateTimePickerAndroid} />
+          <Drawer.Screen name="Monthly View" component={MonthlyView} />
+          {/* <Drawer.Screen name="Calendar" component={CalendarTimelineComponent} /> */}
           <Drawer.Screen name="Notifications" component={GetDimensions} initialParams={{ dimensions }} />
+
       </Drawer.Navigator>
     </ThemeProvider>
   );
