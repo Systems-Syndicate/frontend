@@ -12,6 +12,7 @@ import CreateEvent from './(hamburger)/create_event';
 import GetDimensions from './(hamburger)/get_dimensions';
 import DateTimePickerAndroid from './(hamburger)/create_event_android';
 import MonthlyView from './(hamburger)/monthly_view';
+import CalendarTimelineComponent from './(hamburger)/calendar';
 
 const windowDimensions = Dimensions.get('window');
 const screenDimensions = Dimensions.get('screen');
@@ -82,7 +83,7 @@ export default function App() {
           <Drawer.Screen name="Create Event" component={CreateEvent} />
           <Drawer.Screen name="Create Event alt." component={DateTimePickerAndroid} />
           <Drawer.Screen name="Monthly View" component={MonthlyView} />
-          {/* <Drawer.Screen name="Calendar" component={CalendarTimelineComponent} /> */}
+          <Drawer.Screen name="Calendar" component={CalendarTimelineComponent} />
           <Drawer.Screen name="Notifications" component={GetDimensions} initialParams={{ dimensions }} />
 
       </Drawer.Navigator>
