@@ -5,7 +5,7 @@ import { Alert, StyleSheet, ScrollView, TouchableOpacity, Image, View, Text, Mod
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const backendURL = "http://172.16.10.240:3801/events/123456";
+const backendURL = "http://10.89.243.10:3801/events/123456";
 
 export default function DateTimePickerAndroid() {
     const [modalVisible, setModalVisible] = useState(false);
@@ -296,16 +296,12 @@ export default function DateTimePickerAndroid() {
 
     return (
         <>
-            {/* Circular Add Button */}
-            <TouchableOpacity style={stylesAndroid.addEventBtn} onPress={() => {setModalVisible(true);}}>
-                <MaterialIcons name="add" size={24} color="white" />
-            </TouchableOpacity>
+            <ScrollView style={{padding: 16}}>
 
-            <View style={{ backgroundColor: 'white', height: 120 }}>
-                <Image source={require('@/assets/images/icon.png')} style={{ left: 20, height: 120, width: 220 }}></Image>
-            </View>
+                <View style={{ backgroundColor: 'white', height: 120 }}>
+                    <Image source={require('@/assets/images/icon.png')} style={{ left: 20, height: 120, width: 220 }}></Image>
+                </View>
 
-            <ScrollView>
                 {/* Render Grouped Events */}
                 <View style={stylesAndroid.eventsContainer}>
                     {Object.entries(groupedEvents).map(([date, events]) => (
@@ -356,14 +352,25 @@ export default function DateTimePickerAndroid() {
 
                             {/* Start/End Date Selector */}
                             <Text style={{ color: 'black', textAlign: 'center' }}>{eventStartTime.toLocaleString(('en-GB'))}</Text>
-                            <View style={{ flexDirection: 'row', justifyContent:'space-between', marginTop: 10, marginBottom: 20 }}>
-                                <Button title="Start Date" onPress={() => showModeStart('date')} />
-                                <Button title="Start Time" onPress={() => showModeStart('time')} />
+                            <View style={stylesAndroid.buttonRow}>
+                                <TouchableOpacity style={stylesAndroid.neutralBtn} onPress={() => showModeStart('date')}>
+                                    <Text> Start Date </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={stylesAndroid.neutralBtn} onPress={() => showModeStart('time')}>
+                                    <Text> Start Time </Text>
+                                </TouchableOpacity>
+
                             </View>
-                            <Text style={{ color: 'black', textAlign: 'center' }}>{eventEndTime.toLocaleString(('en-GB'))}</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <Button title="End Date" onPress={() => showModeEnd('date')} />
-                                <Button title="End Time" onPress={() => showModeEnd('time')} />
+                            <Text style={{ color: 'black', textAlign: 'center', marginTop: 10 }}>{eventEndTime.toLocaleString(('en-GB'))}</Text>
+                            <View style={stylesAndroid.buttonRow}>
+                                <TouchableOpacity style={stylesAndroid.neutralBtn} onPress={() => showModeEnd('date')}>
+                                    <Text> End Date </Text>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity style={stylesAndroid.neutralBtn} onPress={() => showModeEnd('time')}>
+                                    <Text> End Time </Text>
+                                </TouchableOpacity>
+
                             </View>
 
                             {showStart && (
@@ -416,8 +423,13 @@ export default function DateTimePickerAndroid() {
                             />
                             {/* Save and Cancel buttons */}
                             <View style={stylesAndroid.buttonRow}>
-                                <Button title="Save" onPress={handleSave} />
-                                <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                                <TouchableOpacity style={stylesAndroid.negativeBtn} onPress={() => setModalVisible(false)}>
+                                    <Text> Cancel </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={stylesAndroid.positiveBtn} onPress={handleSave}>
+                                    <Text> Save </Text>
+                                </TouchableOpacity>
+                                
                             </View>
                             
                         </View>
@@ -440,11 +452,11 @@ export default function DateTimePickerAndroid() {
                                     </ThemedText>
 
                                     <ThemedText style={stylesAndroid.modalText}>
-                                        Visibility: {selectedEvent.classification}
+                                        This event is set to <Text style={{fontWeight: 'bold'}}>{selectedEvent.classification} </Text>
                                     </ThemedText>
 
                                     <ThemedText style={stylesAndroid.modalText}>
-                                        Date: 
+                                        <Text style={{ fontWeight: 'bold' }}>Date: </Text>
                                         {selectedEvent.isAllDay ? (
                                             isSameDay(selectedEvent.startTime, selectedEvent.endTime) ? (
                                                 ` ${format(selectedEvent.startTime, 'EEEE, MMMM d, yyyy')}`
@@ -460,17 +472,31 @@ export default function DateTimePickerAndroid() {
                                         )}
                                     </ThemedText>
 
+
                                     <ThemedText style={stylesAndroid.modalText}>
-                                        Location: {selectedEvent.location}
+                                        <Text style={{ fontWeight: 'bold' }}>Description: </Text> {selectedEvent.description}
                                     </ThemedText>
                                     <ThemedText style={stylesAndroid.modalText}>
-                                        Description: {selectedEvent.description}
+                                        <Text style={{ fontWeight: 'bold' }}>Location:</Text> {selectedEvent.location}
                                     </ThemedText>
 
+                                    <TouchableOpacity style={[stylesAndroid.neutralBtn, {marginLeft: 16, marginRight: 16}]} onPress={toggleClassification}>
+                                        <Text>
+                                            Toggle Visibility
+                                        </Text>
+                                    </TouchableOpacity>
+
                                     <View style={stylesAndroid.buttonRow}>
-                                        <Button title="Delete" onPress={handleDelete} />
-                                        <Button title="Toggle Visibility" onPress={toggleClassification} />
-                                        <Button title="Close" onPress={() => setSelectedEvent(null)} />
+                                        <TouchableOpacity style={stylesAndroid.negativeBtn} onPress={handleDelete}>
+                                            <Text>
+                                                Delete
+                                            </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={stylesAndroid.neutralBtn} onPress={() => setSelectedEvent(null)}>
+                                            <Text>
+                                                Close
+                                            </Text>
+                                        </TouchableOpacity>
                                     </View>
                                 </>
                             )}
@@ -478,6 +504,11 @@ export default function DateTimePickerAndroid() {
                     </View>
                 </Modal>
             </ScrollView>
+
+            {/* Circular Add Button */}
+            <TouchableOpacity style={stylesAndroid.addEventBtn} onPress={() => { setModalVisible(true); }}>
+                <MaterialIcons name="add" size={24} color="white" />
+            </TouchableOpacity>
         </>
     );
 };
@@ -494,6 +525,9 @@ const stylesAndroid = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 15, // Adds shadow for Android
+        position: 'absolute',
+        bottom: 20, // Adjust as needed
+        right: 20,  // Adjust as needed
     },
     buttonText: {
         color: '#fff',
@@ -557,18 +591,38 @@ const stylesAndroid = StyleSheet.create({
         marginBottom: 10,
     },
     modalText: {
-        marginBottom: 15,
+        marginBottom: 8,
         color: 'black',
     },
     switchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        marginVertical: 10,
+        justifyContent: 'space-around',
     },
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 10,
+        paddingHorizontal: 10,
+        marginLeft: 16, 
+        marginRight: 16
     },
+    negativeBtn: {
+        backgroundColor: 'firebrick', 
+        padding: 12,
+        alignItems: 'center',
+        borderRadius: 16,
+    },
+    positiveBtn: {
+        backgroundColor: "seagreen",
+        padding: 12,
+        alignItems: 'center',
+        borderRadius: 16,
+    },
+    neutralBtn: {
+        backgroundColor: "darkgrey", 
+        padding: 12,
+        alignItems: 'center',
+        borderRadius: 16,
+    }
 })
